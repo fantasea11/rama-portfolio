@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
-import { ArrowRight, Mail, Phone, Instagram, FileText, Briefcase, GraduationCap, Award, Layers, MessageCircle, X, ChevronRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, Mail, Phone, Instagram, FileText, Briefcase, GraduationCap, Award, Layers, MessageCircle, X, ChevronRight, ExternalLink, ChevronLeft } from 'lucide-react';
 import { PROJECTS, Project } from './constants';
-import CustomCursor from './components/CustomCursor';
 
 // --- Components ---
 
@@ -588,6 +587,40 @@ function Skills() {
 function ProjectModal({ project, isOpen, onClose }: { project: Project | null; isOpen: boolean; onClose: () => void }) {
   if (!project) return null;
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const index = Math.round(scrollRef.current.scrollLeft / scrollRef.current.clientWidth);
+      if (index !== currentIndex) {
+        setCurrentIndex(index);
+      }
+    }
+  };
+
+  const nextImage = () => {
+    if (project.images.length > 1 && scrollRef.current) {
+      const next = (currentIndex + 1) % project.images.length;
+      scrollRef.current.scrollTo({
+        left: scrollRef.current.clientWidth * next,
+        behavior: 'smooth'
+      });
+      setCurrentIndex(next);
+    }
+  };
+
+  const prevImage = () => {
+    if (project.images.length > 1 && scrollRef.current) {
+      const prev = (currentIndex - 1 + project.images.length) % project.images.length;
+      scrollRef.current.scrollTo({
+        left: scrollRef.current.clientWidth * prev,
+        behavior: 'smooth'
+      });
+      setCurrentIndex(prev);
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -629,7 +662,11 @@ function ProjectModal({ project, isOpen, onClose }: { project: Project | null; i
               <div className="w-full bg-slate-950/40 relative min-h-[300px] md:min-h-[450px] flex items-center justify-center p-6 md:p-12 overflow-hidden border-b border-white/5 group/gallery">
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-950/20" />
                 
-                <div className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-8 items-center">
+                <div 
+                  ref={scrollRef}
+                  onScroll={handleScroll}
+                  className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-8 items-center"
+                >
                   {project.images.map((img, idx) => (
                     <div key={idx} className="flex-none w-full snap-center flex items-center justify-center py-4">
                       <div className="relative max-w-full">
@@ -650,15 +687,36 @@ function ProjectModal({ project, isOpen, onClose }: { project: Project | null; i
 
               {/* Indicator Bar */}
               {project.images.length > 1 && (
-                <div className="flex items-center justify-center py-4 bg-slate-950/20 border-b border-white/5">
+                <div className="flex items-center justify-center py-4 bg-slate-950/20 border-b border-white/5 gap-8">
+                  <button 
+                    onClick={prevImage}
+                    className="p-2 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-all active:scale-95"
+                    title="Previous Image"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
                   <div className="flex items-center gap-4 opacity-50">
                     <div className="flex gap-1.5">
                       {project.images.map((_, i) => (
-                        <div key={i} className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                        <div 
+                          key={i} 
+                          className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${i === currentIndex ? 'bg-blue-500 w-4' : 'bg-white/20'}`} 
+                        />
                       ))}
                     </div>
-                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] whitespace-nowrap">Swipe for more</span>
+                    <span className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em] whitespace-nowrap">
+                      {currentIndex + 1} / {project.images.length}
+                    </span>
                   </div>
+
+                  <button 
+                    onClick={nextImage}
+                    className="p-2 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-all active:scale-95"
+                    title="Next Image"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
               )}
 
@@ -917,7 +975,6 @@ export default function App() {
   
   return (
     <div className="relative font-sans antialiased text-white selection:bg-blue-500/30 selection:text-blue-200">
-      <CustomCursor />
       <Navbar />
       <main>
         <Hero />
