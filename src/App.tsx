@@ -38,7 +38,7 @@ function Navbar() {
         isScrolled ? 'glass' : 'bg-transparent'
       }`}
     >
-      <ul className="flex items-center gap-8">
+      <ul className="flex items-center gap-4 md:gap-8">
         {navItems.map((item) => (
           <li key={item.name}>
             <a
@@ -57,9 +57,9 @@ function Navbar() {
 
 function Hero() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center pt-28 px-6">
+    <section className="relative min-h-[85vh] md:min-h-screen flex flex-col items-center justify-center pt-20 md:pt-28 px-6">
       {/* Background radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[500px] aspect-square bg-blue-600/10 rounded-full blur-[80px] md:blur-[120px] pointer-events-none" />
       
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -85,10 +85,10 @@ function Hero() {
         <span className="inline-block px-4 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold tracking-wider uppercase mb-6 border border-blue-500/20">
           Informatics Graduate
         </span>
-        <h1 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-tight uppercase">
+        <h1 className="text-4xl sm:text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-tight uppercase overflow-hidden">
           HAI! I'M <br className="md:hidden" /> <span className="text-gradient">GALUH RAMA ISMAYA</span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
+        <p className="text-base md:text-xl text-gray-400 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-medium">
           An Informatics graduate with Cum Laude honors (GPA 3.82), 
           offering a unique blend of technical IT expertise and digital creativity.
         </p>
@@ -98,7 +98,7 @@ function Hero() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-8 py-4 bg-white text-black font-bold rounded-full flex items-center gap-2 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all"
+            className="px-6 py-3.5 md:px-8 md:py-4 bg-white text-black font-bold rounded-full flex items-center gap-2 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all text-sm md:text-base"
           >
             Explore My Work <ArrowRight className="w-4 h-4" />
           </motion.button>
@@ -107,7 +107,7 @@ function Hero() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => window.open('https://drive.google.com/file/d/18pYa8wwQd35SJasW857gdXY6RhDiwR3x/view?usp=sharing', '_blank')}
-            className="px-8 py-4 glass text-white font-bold rounded-full hover:bg-white/10 transition-all border border-white/20 flex items-center gap-2"
+            className="px-6 py-3.5 md:px-8 md:py-4 glass text-white font-bold rounded-full hover:bg-white/10 transition-all border border-white/20 flex items-center gap-2 text-sm md:text-base"
           >
             <FileText className="w-4 h-4" /> Download CV
           </motion.button>
@@ -116,7 +116,7 @@ function Hero() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-            className="px-8 py-4 glass text-white font-bold rounded-full hover:bg-white/10 transition-all border border-white/20 flex items-center gap-2"
+            className="px-6 py-3.5 md:px-8 md:py-4 glass text-white font-bold rounded-full hover:bg-white/10 transition-all border border-white/20 flex items-center gap-2 text-sm md:text-base"
           >
             <Mail className="w-4 h-4" /> Contact Me
           </motion.button>
@@ -136,16 +136,16 @@ function Hero() {
 
 function SectionHeading({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
-    <div className="mb-12">
+    <div className="mb-8 md:mb-12">
       <motion.h2 
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
-        className="text-4xl md:text-5xl font-bold mb-4"
+        className="text-2xl sm:text-4xl md:text-5xl font-black mb-3 md:mb-4 uppercase tracking-tighter"
       >
         {title}
       </motion.h2>
-      {subtitle && <p className="text-gray-400 text-lg max-w-xl">{subtitle}</p>}
+      {subtitle && <p className="text-sm md:text-lg text-gray-400 font-medium tracking-tight max-w-xl">{subtitle}</p>}
     </div>
   );
 }
@@ -161,21 +161,21 @@ function About() {
   ];
 
   return (
-    <section id="about" className="py-24 px-6 max-w-6xl mx-auto">
+    <section id="about" className="py-16 md:py-24 px-6 max-w-6xl mx-auto">
       <SectionHeading 
         title="About Me" 
         subtitle="Bridging the gap between operational management and technical automation. With a highly versatile skill set spanning Informatics, Office Administration, and Creative Production, I quickly adapt to new environments and master emerging tools. I thrive on identifying process gaps and solving them through high-efficiency AI workflows, always driven by a fast-paced eagerness to learn, innovate, and deliver impactful results."
       />
       
-      <div className="flex flex-col md:flex-row gap-12 mt-16">
-        <div className="flex flex-col gap-3 md:w-1/3">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-12 mt-10 md:mt-16">
+        <div className="grid grid-cols-2 md:flex md:flex-col gap-2 md:gap-3 md:w-1/3">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-4 px-6 py-5 rounded-[24px] transition-all duration-300 text-left relative overflow-hidden group ${
+              className={`flex items-center gap-2 md:gap-4 px-3 md:px-6 py-3 md:py-5 rounded-[16px] md:rounded-[24px] transition-all duration-300 text-left relative overflow-hidden group ${
                 activeTab === tab.id 
-                  ? 'bg-blue-600/10 text-blue-400 border border-blue-500/30 shadow-lg shadow-blue-900/10' 
+                  ? 'bg-blue-600/10 text-blue-400 border border-blue-500/30' 
                   : 'bg-slate-900/40 border border-transparent hover:border-white/10 text-gray-500 hover:text-gray-300'
               }`}
             >
@@ -188,13 +188,13 @@ function About() {
                   transition={{ duration: 0.3 }}
                 />
               )}
-              <tab.icon className={`w-5 h-5 z-10 transition-transform duration-300 ${activeTab === tab.id ? 'scale-110' : 'group-hover:scale-110 group-hover:text-gray-400'}`} />
-              <span className="font-bold z-10 tracking-wide">{tab.label}</span>
+              <tab.icon className={`w-4 h-4 md:w-5 md:h-5 z-10 transition-transform duration-300 ${activeTab === tab.id ? 'scale-110' : 'group-hover:scale-110 group-hover:text-gray-400'}`} />
+              <span className="text-[10px] md:text-sm font-bold z-10 tracking-wide">{tab.label}</span>
             </button>
           ))}
         </div>
         
-        <div className="md:w-2/3 bg-slate-900/40 p-8 md:p-12 rounded-[40px] min-h-[400px] border border-white/5 hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden group hover:shadow-2xl hover:shadow-blue-900/20">
+        <div className="md:w-2/3 bg-slate-900/40 p-5 md:p-12 rounded-[28px] md:rounded-[40px] min-h-[350px] md:min-h-[400px] border border-white/5 hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden group hover:shadow-2xl hover:shadow-blue-900/20">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10 h-full">
             <AnimatePresence mode="wait">
@@ -209,9 +209,9 @@ function About() {
                 <div className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors">Universitas Nusa Mandiri</h3>
-                      <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">2021 — 2025</span>
+                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
+                      <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words">Universitas Nusa Mandiri</h3>
+                      <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">2021 — 2025</span>
                     </div>
                     <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">Informatics (GPA 3.82) • Cum Laude</p>
                     <p className="text-gray-400 leading-relaxed text-sm font-medium">
@@ -228,9 +228,9 @@ function About() {
                 <div className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors">SMK Setia Negara</h3>
-                      <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">2018 — 2021</span>
+                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
+                      <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words">SMK Setia Negara</h3>
+                      <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">2018 — 2021</span>
                     </div>
                     <p className="text-gray-500 mb-4 font-bold uppercase text-xs tracking-widest">Office Administration & Management</p>
                     <p className="text-gray-400 leading-relaxed text-sm font-medium">
@@ -428,9 +428,9 @@ function About() {
 
 function SkillRadar({ data }: { data: any[] }) {
   return (
-    <div className="h-[320px] w-full flex items-center justify-center">
+    <div className="h-[280px] md:h-[320px] w-full flex items-center justify-center overflow-hidden">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
+        <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>
           <PolarGrid stroke="#ffffff10" />
           <PolarAngleAxis 
             dataKey="subject" 
@@ -506,15 +506,15 @@ function Skills() {
   }));
 
   return (
-    <section id="skills" className="py-32 px-6 max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+    <section id="skills" className="py-20 md:py-32 px-6 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 mb-10 md:mb-16">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-4">
-            SKILLS & <span className="text-blue-500 text-gradient">PROFICIENCY</span>
+            SKILLS & <span className="text-gradient">PROFICIENCY</span>
           </h2>
           <p className="text-slate-400 text-lg max-w-xl font-medium tracking-tight">
             A cross-disciplinary toolkit combining technical infrastructure with high-end creative output.
@@ -522,11 +522,11 @@ function Skills() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
         {/* Radar Map - Large Feature */}
         <motion.div 
           whileHover={{ y: -8, transition: { duration: 0.3 } }}
-          className="lg:col-span-2 lg:row-span-2 bg-slate-900/40 border border-white/5 rounded-[40px] p-8 flex flex-col items-center justify-center min-h-[400px] hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden"
+          className="lg:col-span-2 lg:row-span-2 bg-slate-900/40 border border-white/5 rounded-[32px] md:rounded-[40px] p-6 md:p-8 flex flex-col items-center justify-center min-h-[350px] md:min-h-[400px] hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="text-center mb-4 relative z-10">
@@ -541,7 +541,7 @@ function Skills() {
         {/* Proficiency Matrix - Vertical List */}
         <motion.div 
           whileHover={{ y: -8, transition: { duration: 0.3 } }}
-          className="lg:col-span-2 bg-slate-900/40 border border-white/5 rounded-[40px] p-10 hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden"
+          className="lg:col-span-2 bg-slate-900/40 border border-white/5 rounded-[32px] md:rounded-[40px] p-6 md:p-10 hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="relative z-10">
@@ -549,7 +549,7 @@ function Skills() {
               <h3 className="text-xs font-black text-white uppercase tracking-[0.3em]">Proficiency Matrix</h3>
               <div className="h-[1px] flex-1 bg-white/10 group-hover:bg-blue-500/20 transition-colors" />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 md:gap-y-8">
               {proficiencies.map((p) => (
                 <SkillBar key={p.skill} skill={p.skill} level={p.level} color={p.color} />
               ))}
@@ -646,7 +646,7 @@ function ProjectModal({ project, isOpen, onClose }: { project: Project | null; i
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 30 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className="relative w-full max-w-6xl max-h-[90vh] glass rounded-[40px] overflow-hidden flex flex-col border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)]"
+            className="relative w-full max-w-6xl max-h-[90vh] glass rounded-[32px] md:rounded-[40px] overflow-hidden flex flex-col border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)]"
           >
             {/* Close Button */}
             <button 
@@ -724,7 +724,7 @@ function ProjectModal({ project, isOpen, onClose }: { project: Project | null; i
               <div className="p-8 md:p-16 flex flex-col md:flex-row gap-12 bg-slate-900/10">
                 <div className="md:w-1/2">
                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] mb-4 block">Portfolio Showcase</span>
-                   <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.95] mb-6">
+                   <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.95] mb-6">
                      {project.title}
                    </h2>
                    <div className="flex flex-wrap gap-2">
@@ -779,7 +779,7 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
       whileInView={{ opacity: 1, scale: 1 }}
       whileHover={{ y: -10 }}
       onClick={onClick}
-      className="group relative glass rounded-[40px] overflow-hidden cursor-pointer interactive border border-white/5 hover:border-blue-500/30 transition-all duration-500 h-full flex flex-col"
+      className="group relative glass rounded-[32px] md:rounded-[40px] overflow-hidden cursor-pointer interactive border border-white/5 hover:border-blue-500/30 transition-all duration-500 h-full flex flex-col"
     >
       <div className="aspect-[4/3] relative overflow-hidden bg-slate-900">
         <img 
@@ -839,7 +839,7 @@ function Portfolio() {
     : PROJECTS.filter(p => p.category === filter);
 
   return (
-    <section id="portfolio" className="py-24 px-6 max-w-7xl mx-auto">
+    <section id="portfolio" className="py-16 md:py-24 px-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
         <div className="space-y-4">
           <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em]">Showcase</span>
@@ -870,7 +870,7 @@ function Portfolio() {
 
       <motion.div 
         layout
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-8"
       >
         <AnimatePresence mode="popLayout">
           {filteredProjects.map((project) => (
@@ -892,42 +892,42 @@ function Portfolio() {
 
 function Contact() {
   return (
-    <section id="contact" className="py-24 px-6 max-w-4xl mx-auto text-center">
+    <section id="contact" className="py-16 md:py-24 px-6 max-w-4xl mx-auto text-center">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
-        className="glass p-12 md:p-20 rounded-[40px] relative overflow-hidden"
+        className="glass p-8 md:p-20 rounded-[32px] md:rounded-[40px] relative overflow-hidden"
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
         
-        <h2 className="text-4xl md:text-6xl font-black mb-8">READY TO <span className="text-gradient">COLLABORATE?</span></h2>
-        <p className="text-gray-400 text-lg mb-12 max-w-xl mx-auto">
+        <h2 className="text-3xl sm:text-4xl md:text-6xl font-black mb-8 leading-tight">READY TO <span className="text-gradient">COLLABORATE?</span></h2>
+        <p className="text-gray-400 text-base md:text-lg mb-12 max-w-xl mx-auto font-medium">
           Feel free to reach out for projects, collaborations, or just a digital handshake.
         </p>
         
-        <div className="flex flex-col items-center justify-center gap-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl">
-            <div className="flex flex-col items-center gap-4 p-8 glass rounded-3xl">
-              <div className="p-4 rounded-full bg-blue-500/10 text-blue-400">
-                <Mail className="w-8 h-8" />
+        <div className="flex flex-col items-center justify-center gap-10 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 w-full max-w-2xl">
+            <div className="flex flex-col items-center gap-4 p-6 md:p-8 glass rounded-3xl">
+              <div className="p-3 md:p-4 rounded-full bg-blue-500/10 text-blue-400">
+                <Mail className="w-6 h-6 md:w-8 md:h-8" />
               </div>
-              <div className="text-center">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Email Me</p>
-                <p className="text-xl font-bold select-all cursor-text text-white">fantaseaindo@gmail.com</p>
+              <div className="text-center w-full overflow-hidden">
+                <p className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Email Me</p>
+                <p className="text-sm sm:text-base md:text-xl font-black select-all cursor-text text-white break-all">fantaseaindo@gmail.com</p>
               </div>
-              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=fantaseaindo@gmail.com" target="_blank" rel="noreferrer" className="text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors">Direct Mail (Gmail) →</a>
+              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=fantaseaindo@gmail.com" target="_blank" rel="noreferrer" className="text-xs md:text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors">Direct Mail (Gmail) →</a>
             </div>
             
-            <div className="flex flex-col items-center gap-4 p-8 glass rounded-3xl">
-              <div className="p-4 rounded-full bg-blue-500/10 text-blue-400">
-                <MessageCircle className="w-8 h-8" />
+            <div className="flex flex-col items-center gap-4 p-6 md:p-8 glass rounded-3xl">
+              <div className="p-3 md:p-4 rounded-full bg-blue-500/10 text-blue-400">
+                <MessageCircle className="w-6 h-6 md:w-8 md:h-8" />
               </div>
-              <div className="text-center">
-                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">WhatsApp Me</p>
-                <p className="text-xl font-bold select-all cursor-text text-white">+62 895 365 146160</p>
+              <div className="text-center w-full overflow-hidden">
+                <p className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest mb-2">WhatsApp Me</p>
+                <p className="text-sm sm:text-base md:text-xl font-black select-all cursor-text text-white">+62 895 365 146160</p>
               </div>
-              <a href="https://wa.me/62895365146160" target="_blank" rel="noreferrer" className="text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors">Chat on WhatsApp →</a>
+              <a href="https://wa.me/62895365146160" target="_blank" rel="noreferrer" className="text-xs md:text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors">Chat on WhatsApp →</a>
             </div>
           </div>
 
