@@ -44,7 +44,7 @@ function Navbar() {
             <a
               href={item.href}
               onClick={(e) => scrollToSection(e, item.href)}
-              className="text-sm font-medium text-gray-400 hover:text-white transition-colors"
+              className="text-sm font-bold text-gray-400 hover:text-white transition-colors tracking-tight font-display"
             >
               {item.name}
             </a>
@@ -85,7 +85,7 @@ function Hero() {
         <span className="inline-block px-4 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold tracking-wider uppercase mb-6 border border-blue-500/20">
           Informatics Graduate
         </span>
-        <h1 className="text-4xl sm:text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-tight uppercase overflow-hidden">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black mb-8 tracking-tighter leading-tight uppercase overflow-hidden font-display">
           HAI! I'M <br className="md:hidden" /> <span className="text-gradient">GALUH RAMA ISMAYA</span>
         </h1>
         <p className="text-base md:text-xl text-gray-400 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-medium">
@@ -141,7 +141,7 @@ function SectionHeading({ title, subtitle }: { title: string; subtitle?: string 
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
-        className="text-2xl sm:text-4xl md:text-5xl font-black mb-3 md:mb-4 uppercase tracking-tighter"
+        className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 md:mb-4 uppercase tracking-tighter font-display"
       >
         {title}
       </motion.h2>
@@ -210,7 +210,7 @@ function About() {
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
                     <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
-                      <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words">Universitas Nusa Mandiri</h3>
+                      <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words font-display">Universitas Nusa Mandiri</h3>
                       <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">2021 — 2025</span>
                     </div>
                     <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">Informatics (GPA 3.82) • Cum Laude</p>
@@ -229,7 +229,7 @@ function About() {
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
                     <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
-                      <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words">SMK Setia Negara</h3>
+                      <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words font-display">SMK Setia Negara</h3>
                       <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">2018 — 2021</span>
                     </div>
                     <p className="text-gray-500 mb-4 font-bold uppercase text-xs tracking-widest">Office Administration & Management</p>
@@ -257,7 +257,7 @@ function About() {
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
                     <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors">MikroTik Certified Network Associate (MTCNA)</h3>
+                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">MikroTik Certified Network Associate (MTCNA)</h3>
                     </div>
                     <p className="text-blue-400 text-xs font-bold mb-6 tracking-widest uppercase">Credential ID: 2205NA2894</p>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-400 text-sm font-medium">
@@ -364,7 +364,7 @@ function About() {
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
                     <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors">Creative Director & Host</h3>
+                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">Creative Director & Host</h3>
                       <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">2022 — 2025</span>
                     </div>
                     <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">UniPin (Work From Home)</p>
@@ -383,7 +383,7 @@ function About() {
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
                     <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors">Multimedia & IT Support Intern</h3>
+                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">Multimedia & IT Support Intern</h3>
                       <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">2024</span>
                     </div>
                     <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">PT VEGA Instruments Indonesia</p>
@@ -402,7 +402,7 @@ function About() {
                   <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="relative z-10">
                     <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors">Library System Management</h3>
+                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">Library System Management</h3>
                       <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">2019</span>
                     </div>
                     <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">Internship at IISIP Jakarta</p>
@@ -513,7 +513,7 @@ function Skills() {
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase mb-4">
+          <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase mb-4 font-display">
             SKILLS & <span className="text-gradient">PROFICIENCY</span>
           </h2>
           <p className="text-slate-400 text-lg max-w-xl font-medium tracking-tight">
@@ -531,7 +531,7 @@ function Skills() {
           <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="text-center mb-4 relative z-10">
             <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Competency Radar</span>
-            <h3 className="text-lg font-bold text-white mt-1 uppercase">Skill Mapping</h3>
+            <h3 className="text-lg font-bold text-white mt-1 uppercase font-display">Skill Mapping</h3>
           </div>
           <div className="relative z-10 w-full">
             <SkillRadar data={radarData} />
@@ -546,7 +546,7 @@ function Skills() {
           <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-10">
-              <h3 className="text-xs font-black text-white uppercase tracking-[0.3em]">Proficiency Matrix</h3>
+              <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] font-display">Proficiency Matrix</h3>
               <div className="h-[1px] flex-1 bg-white/10 group-hover:bg-blue-500/20 transition-colors" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 md:gap-y-8">
@@ -568,7 +568,7 @@ function Skills() {
           >
             <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
             <div className="relative z-10">
-              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 group-hover:text-blue-400 transition-colors">{group.title}</h3>
+              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 group-hover:text-blue-400 transition-colors font-display">{group.title}</h3>
               <div className="flex flex-wrap gap-2">
                 {group.skills.map(skill => (
                   <span key={skill} className="px-3 py-1.5 rounded-lg bg-white/5 text-[11px] font-bold text-slate-300 border border-white/5 group-hover:border-blue-500/20 group-hover:bg-blue-500/5 transition-all">
@@ -724,7 +724,7 @@ function ProjectModal({ project, isOpen, onClose }: { project: Project | null; i
               <div className="p-8 md:p-16 flex flex-col md:flex-row gap-12 bg-slate-900/10">
                 <div className="md:w-1/2">
                    <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.4em] mb-4 block">Portfolio Showcase</span>
-                   <h2 className="text-2xl sm:text-3xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.95] mb-6">
+                   <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-tighter leading-[0.95] mb-6 font-display">
                      {project.title}
                    </h2>
                    <div className="flex flex-wrap gap-2">
@@ -808,7 +808,7 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
       </div>
       
       <div className="p-8 flex flex-col flex-1">
-        <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter leading-tight mb-4 group-hover:text-blue-400 transition-colors">
+        <h3 className="text-lg md:text-xl font-black text-white uppercase tracking-tighter leading-tight mb-4 group-hover:text-blue-400 transition-colors font-display">
           {project.title}
         </h3>
         <p className="text-gray-400 text-sm font-medium leading-relaxed mb-6 line-clamp-2">
@@ -842,8 +842,8 @@ function Portfolio() {
     <section id="portfolio" className="py-16 md:py-24 px-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
         <div className="space-y-4">
-          <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em]">Showcase</span>
-          <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase">
+          <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] font-display">Showcase</span>
+          <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase font-display">
             SELECTED <span className="text-gradient">WORKS</span>
           </h2>
           <p className="text-gray-400 text-lg max-w-xl font-medium tracking-tight">
@@ -901,7 +901,7 @@ function Contact() {
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
         
-        <h2 className="text-3xl sm:text-4xl md:text-6xl font-black mb-8 leading-tight">READY TO <span className="text-gradient">COLLABORATE?</span></h2>
+        <h2 className="text-2xl sm:text-4xl md:text-5xl font-black mb-8 leading-tight font-display">READY TO <span className="text-gradient">COLLABORATE?</span></h2>
         <p className="text-gray-400 text-base md:text-lg mb-12 max-w-xl mx-auto font-medium">
           Feel free to reach out for projects, collaborations, or just a digital handshake.
         </p>
@@ -913,7 +913,7 @@ function Contact() {
                 <Mail className="w-6 h-6 md:w-8 md:h-8" />
               </div>
               <div className="text-center w-full overflow-hidden">
-                <p className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Email Me</p>
+                <p className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest mb-2 font-display">Email Me</p>
                 <p className="text-sm sm:text-base md:text-xl font-black select-all cursor-text text-white break-all">fantaseaindo@gmail.com</p>
               </div>
               <a href="https://mail.google.com/mail/?view=cm&fs=1&to=fantaseaindo@gmail.com" target="_blank" rel="noreferrer" className="text-xs md:text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors">Direct Mail (Gmail) →</a>
@@ -924,7 +924,7 @@ function Contact() {
                 <MessageCircle className="w-6 h-6 md:w-8 md:h-8" />
               </div>
               <div className="text-center w-full overflow-hidden">
-                <p className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest mb-2">WhatsApp Me</p>
+                <p className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest mb-2 font-display">WhatsApp Me</p>
                 <p className="text-sm sm:text-base md:text-xl font-black select-all cursor-text text-white">+62 895 365 146160</p>
               </div>
               <a href="https://wa.me/62895365146160" target="_blank" rel="noreferrer" className="text-xs md:text-sm font-bold text-blue-500 hover:text-blue-400 transition-colors">Chat on WhatsApp →</a>
@@ -933,7 +933,7 @@ function Contact() {
 
           <div className="flex flex-col items-center gap-6">
             <div className="flex items-center gap-3">
-              <h4 className="text-sm font-bold text-gray-600 uppercase tracking-widest">Connect</h4>
+              <h4 className="text-sm font-bold text-gray-600 uppercase tracking-widest font-display">Connect</h4>
               <div className="w-12 h-[1px] bg-white/10" />
             </div>
             <a 
@@ -956,7 +956,7 @@ function Footer() {
   return (
     <footer className="py-12 px-6 border-t border-white/5">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-        <p className="text-gray-500 font-medium">© 2026 • GALUH RAMA ISMAYA</p>
+        <p className="text-gray-500 font-bold font-display tracking-tight">© 2026 • GALUH RAMA ISMAYA</p>
         <div className="flex items-center gap-8 text-sm text-gray-500">
            <a href="#about" className="hover:text-white transition-colors">About</a>
            <a href="#portfolio" className="hover:text-white transition-colors">Projects</a>
@@ -987,27 +987,22 @@ export default function App() {
       
       {/* Decorative background elements */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 bg-[#0a0a0b]">
-        {/* Garis-garis abstract pattern (Tech Grid) */}
+        {/* Organic Abstract Curves (Latte Art / Wood Grain style) */}
         <div 
-          className="absolute inset-0 opacity-[0.05]"
+          className="absolute inset-0 opacity-[0.15]"
           style={{
-             backgroundImage: `
-               linear-gradient(to right, #ffffff 1px, transparent 1px),
-               linear-gradient(to bottom, #ffffff 1px, transparent 1px)
-             `,
-             backgroundSize: '4rem 4rem',
+             backgroundImage: `url("data:image/svg+xml,%3Csvg width='1000' height='1000' viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 500 C 250 400, 450 600, 650 400 C 850 200, 1000 400, 1200 500' stroke='white' fill='none' stroke-width='1' opacity='0.5'/%3E%3Cpath d='M0 600 C 250 500, 450 700, 650 500 C 850 300, 1000 500, 1200 600' stroke='white' fill='none' stroke-width='1' opacity='0.3'/%3E%3Cpath d='M0 400 C 250 300, 450 500, 650 300 C 850 100, 1000 300, 1200 400' stroke='white' fill='none' stroke-width='1' opacity='0.3'/%3E%3Cpath d='M0 700 C 250 600, 450 800, 650 600 C 850 400, 1000 600, 1200 700' stroke='white' fill='none' stroke-width='1' opacity='0.2'/%3E%3Cpath d='M0 300 C 250 200, 450 400, 650 200 C 850 0, 1000 200, 1200 300' stroke='white' fill='none' stroke-width='1' opacity='0.2'/%3E%3C/svg%3E")`,
+             backgroundSize: '100% 100%',
              backgroundPosition: 'center center'
           }}
         />
         
-        {/* Diagonal abstract lines */}
+        {/* Fluid Accent Curves (Blue & Purple) */}
         <div 
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.1]"
           style={{
-             backgroundImage: `
-               repeating-linear-gradient(45deg, transparent, transparent 60px, #3b82f6 60px, #3b82f6 61px),
-               repeating-linear-gradient(-45deg, transparent, transparent 60px, #8b5cf6 60px, #8b5cf6 61px)
-             `,
+             backgroundImage: `url("data:image/svg+xml,%3Csvg width='1000' height='1000' viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-200 300 C 100 200, 300 400, 500 200 C 700 0, 900 200, 1100 300' stroke='%233b82f6' fill='none' stroke-width='2' opacity='0.6'/%3E%3Cpath d='M-100 850 C 200 750, 400 950, 600 750 C 800 550, 1000 750, 1200 850' stroke='%238b5cf6' fill='none' stroke-width='2' opacity='0.6'/%3E%3Cpath d='M200 -100 C 400 100, 600 -100, 800 100 C 1000 300, 1200 100, 1400 -100' stroke='%233b82f6' fill='none' stroke-width='1' opacity='0.4'/%3E%3C/svg%3E")`,
+             backgroundSize: '100% 100%',
              backgroundPosition: 'center center'
           }}
         />
