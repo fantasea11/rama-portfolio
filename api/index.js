@@ -228,6 +228,8 @@ app.post('/upload', authenticateToken, upload.single('image'), (req, res) => {
   }
 });
 
+app.get('/test', (req, res) => res.json({ message: 'API is working' }));
+
 // Export for Vercel
 export default app;
 
