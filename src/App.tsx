@@ -76,8 +76,9 @@ function Hero() {
           <img 
             src="https://i.postimg.cc/W1vzp65s/Gemini-Generated-Image-vr34qqvr34qqvr34-removebg-preview.png" 
             alt="Galuh Rama Ismaya" 
-            className="w-full h-full object-cover rounded-full"
+            className="w-full h-full object-cover rounded-full select-none"
             referrerPolicy="no-referrer"
+            draggable={false}
           />
           <div className="absolute inset-0 rounded-full border-2 border-blue-500/30 animate-pulse pointer-events-none" />
         </motion.div>
@@ -673,8 +674,9 @@ function ProjectModal({ project, isOpen, onClose }: { project: Project | null; i
                         <img 
                           src={img} 
                           alt={`${project.title} documentation ${idx + 1}`}
-                          className="max-w-full max-h-[40vh] md:max-h-[55vh] object-contain rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.6)] border border-white/10"
+                          className="max-w-full max-h-[40vh] md:max-h-[55vh] object-contain rounded-2xl shadow-[0_30px_60px_rgba(0,0,0,0.6)] border border-white/10 select-none"
                           referrerPolicy="no-referrer"
+                          draggable={false}
                         />
                         <div className="absolute top-4 left-4 px-3 py-1.5 rounded-xl bg-black/60 backdrop-blur-xl border border-white/10 text-[9px] font-black text-white/50 uppercase tracking-[0.2em] shadow-lg">
                           Asset 0{idx + 1}
@@ -785,8 +787,9 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
         <img 
           src={project.images[0]} 
           alt={project.title}
-          className="w-full h-full object-cover opacity-60 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700"
+          className="w-full h-full object-cover opacity-60 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700 select-none"
           referrerPolicy="no-referrer"
+          draggable={false}
         />
         
         {/* Overlay Decoration */}
@@ -970,9 +973,28 @@ function Footer() {
 // --- Main App ---
 
 export default function App() {
-  // Smooth scroll logic is handled by standard HTML href + scroll-behavior: smooth in CSS
-  // but we can ensure a nice entry animation for the whole page
-  
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      if ((e.target as HTMLElement).tagName === 'IMG') {
+        e.preventDefault();
+      }
+    };
+    
+    const handleDragStart = (e: DragEvent) => {
+      if ((e.target as HTMLElement).tagName === 'IMG') {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('dragstart', handleDragStart);
+    
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('dragstart', handleDragStart);
+    };
+  }, []);
+
   return (
     <div className="relative font-sans antialiased text-white selection:bg-blue-500/30 selection:text-blue-200">
       <Navbar />
