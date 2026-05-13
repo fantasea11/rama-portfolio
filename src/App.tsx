@@ -74,7 +74,7 @@ function Hero() {
           className="relative w-32 h-32 md:w-44 md:h-44 mb-8 p-1.5 glass rounded-full"
         >
           <img 
-            src="https://i.postimg.cc/W1vzp65s/Gemini-Generated-Image-vr34qqvr34qqvr34-removebg-preview.png" 
+            src="/images/Gemini-Generated-Image-vr34qqvr34qqvr34-removebg-preview.png" 
             alt="Galuh Rama Ismaya" 
             className="w-full h-full object-cover rounded-full select-none"
             referrerPolicy="no-referrer"
