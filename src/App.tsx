@@ -56,10 +56,21 @@ function Navbar() {
 }
 
 function Hero() {
+  const [profilePicture, setProfilePicture] = useState('/images/profile-picture-default.png');
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.profilePicture) setProfilePicture(data.profilePicture);
+      })
+      .catch(err => console.error("Failed to fetch settings", err));
+  }, []);
+
   return (
     <section className="relative min-h-[85vh] md:min-h-screen flex flex-col items-center justify-center pt-20 md:pt-28 px-6">
       {/* Background radial glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[500px] aspect-square bg-blue-600/10 rounded-full blur-[80px] md:blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 w-full max-w-[500px] aspect-square bg-blue-600/15 rounded-full blur-[80px] md:blur-[120px] pointer-events-none animate-breathing-glow" />
       
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -74,7 +85,7 @@ function Hero() {
           className="relative w-32 h-32 md:w-44 md:h-44 mb-8 p-1.5 glass rounded-full"
         >
           <img 
-            src="/images/Gemini-Generated-Image-vr34qqvr34qqvr34-removebg-preview.png" 
+            src={profilePicture} 
             alt="Galuh Rama Ismaya" 
             className="w-full h-full object-cover rounded-full select-none"
             referrerPolicy="no-referrer"
@@ -153,6 +164,19 @@ function SectionHeading({ title, subtitle }: { title: string; subtitle?: string 
 
 function About() {
   const [activeTab, setActiveTab] = useState('education');
+  const [selectedCert, setSelectedCert] = useState<string | null>(null);
+
+  const [educationData, setEducationData] = useState<any[]>([]);
+  const [experienceData, setExperienceData] = useState<any[]>([]);
+  const [certificationData, setCertificationData] = useState<any[]>([]);
+  const [seminarsData, setSeminarsData] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/education').then(res => res.json()).then(data => { if(Array.isArray(data)) setEducationData(data) }).catch(console.error);
+    fetch('/api/experience').then(res => res.json()).then(data => { if(Array.isArray(data)) setExperienceData(data) }).catch(console.error);
+    fetch('/api/certification').then(res => res.json()).then(data => { if(Array.isArray(data)) setCertificationData(data) }).catch(console.error);
+    fetch('/api/seminars').then(res => res.json()).then(data => { if(Array.isArray(data)) setSeminarsData(data) }).catch(console.error);
+  }, []);
 
   const tabs = [
     { id: 'education', label: 'Education', icon: GraduationCap },
@@ -207,42 +231,24 @@ function About() {
                 exit={{ opacity: 0, y: -10 }}
                 className="space-y-6"
               >
-                <div className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
-                      <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words font-display">Universitas Nusa Mandiri</h3>
-                      <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">2021 — 2025</span>
-                    </div>
-                    <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">Informatics (GPA 3.82) • Cum Laude</p>
-                    <p className="text-gray-400 leading-relaxed text-sm font-medium">
-                      Focused on a multi-disciplinary approach to technology, specializing in Web Development, complex Networking infrastructure, and advanced AI-Powered Workflow Automation. I dedicated my academic journey to mastering the bridge between software architecture and automated intelligence, developing self-sustaining systems through technical rigor.
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-6">
-                       <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">Web Development</span>
-                       <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">Networking</span>
-                       <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">AI Workflow Automation</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
-                      <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words font-display">SMK Setia Negara</h3>
-                      <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">2018 — 2021</span>
-                    </div>
-                    <p className="text-gray-500 mb-4 font-bold uppercase text-xs tracking-widest">Office Administration & Management</p>
-                    <p className="text-gray-400 leading-relaxed text-sm font-medium">
-                      Mastered the core principles of organizational management, providing the essential domain knowledge of how enterprises function. Developed strong foundations in secretarial procedures, financial document processing, correspondence scheduling, and ERP system fundamentals, bridging the theoretical gap for my later technical automation pursuits.
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-4 mt-6">
-                       <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">Business Administration</span>
-                       <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">Secretarial Operations</span>
+                {educationData.map((item, idx) => (
+                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                      <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
+                        <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words font-display">{item.title}</h3>
+                        <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">{item.date}</span>
+                      </div>
+                      <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">{item.subtitle}</p>
+                      <p className="text-gray-400 leading-relaxed text-sm font-medium">{item.description}</p>
+                      <div className="flex flex-wrap gap-2 mt-6">
+                         {item.tags?.map((tag: string) => (
+                           <span key={tag} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tag}</span>
+                         ))}
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </motion.div>
             )}
 
@@ -254,29 +260,34 @@ function About() {
                 exit={{ opacity: 0, y: -10 }}
                 className="space-y-6"
               >
-                <div className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">MikroTik Certified Network Associate (MTCNA)</h3>
+                {certificationData.map((cert, idx) => (
+                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group flex flex-col">
+                    <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10 flex-1">
+                      <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
+                        <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">{cert.title}</h3>
+                      </div>
+                      <p className="text-blue-400 text-xs font-bold mb-6 tracking-widest uppercase">{cert.subtitle}</p>
+                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-400 text-sm font-medium mb-5">
+                        {cert.features?.map((feature: string, fIdx: number) => (
+                          <li key={fIdx} className="flex items-center gap-3">
+                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> {feature}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <p className="text-blue-400 text-xs font-bold mb-6 tracking-widest uppercase">Credential ID: 2205NA2894</p>
-                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-400 text-sm font-medium">
-                      <li className="flex items-center gap-3">
-                         <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> Routing & Firewall
-                      </li>
-                      <li className="flex items-center gap-3">
-                         <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> NAT Configuration
-                      </li>
-                      <li className="flex items-center gap-3">
-                         <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> Wireless Networking
-                      </li>
-                      <li className="flex items-center gap-3">
-                         <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> Valid until May 2028
-                      </li>
-                    </ul>
+                    {cert.image && (
+                      <div className="relative z-10 mt-auto pt-2">
+                        <button 
+                          onClick={() => setSelectedCert(cert.image)}
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/20 hover:text-white transition-colors w-max"
+                        >
+                          <Award className="w-3.5 h-3.5" /> View Certificate
+                        </button>
+                      </div>
+                    )}
                   </div>
-                </div>
+                ))}
               </motion.div>
             )}
 
@@ -305,39 +316,10 @@ function About() {
                     </p>
                   </div>
                 </div>
-                {[
-                  {
-                    title: "Smart Business: Memprediksi Risiko Dengan Machine Learning",
-                    issuer: "Nusa Mandiri University",
-                    date: "June 2025",
-                    summary: "Implementing risk prediction models for data-driven business optimization.",
-                    details: "Learned to build predictive models that identify financial risks and market volatility using advanced ML algorithms."
-                  },
-                  {
-                    title: "Implementation Of Machine Learning Prediction Algorithms",
-                    issuer: "Nusa Mandiri University",
-                    date: "Nov 2024",
-                    summary: "Practical application of predictive analytics in technical workflows.",
-                    details: "Focused on supervised learning techniques, including regression and classification models, to solve complex data challenges."
-                  },
-                  {
-                    title: "Building Smart Campus With IoT Technology",
-                    issuer: "Nusa Mandiri University",
-                    date: "June 2023",
-                    summary: "Architecting automated solutions using sensor networks and smart infrastructure.",
-                    details: "Explored the integration of hardware and software to enhance organizational efficiency through real-time data monitoring."
-                  },
-                  {
-                    title: "Workshop UI/UX Design For Mobile App Development",
-                    issuer: "Nusa Mandiri University",
-                    date: "Dec 2022",
-                    summary: "Human-centric digital design focused on mobile usability and aesthetic flow.",
-                    details: "Practical training in wireframing, user-flow mapping, and high-fidelity prototyping for modern mobile applications."
-                  }
-                ].map((item, idx) => (
-                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
+                {seminarsData.map((item, idx) => (
+                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group flex flex-col">
                     <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10">
+                    <div className="relative z-10 flex-1">
                       <div className="flex flex-col md:flex-row md:justify-between items-start mb-3">
                         <div className="space-y-1">
                           <h4 className="font-black text-white text-base md:text-lg uppercase leading-tight group-hover:text-blue-400 transition-colors pr-4">{item.title}</h4>
@@ -346,8 +328,18 @@ function About() {
                         <span className="text-[10px] font-black text-gray-500 bg-white/5 px-3 py-1 rounded-full uppercase tracking-widest whitespace-nowrap mt-2 md:mt-0 border border-white/10">{item.date}</span>
                       </div>
                       <p className="text-sm font-medium text-gray-300 mb-3 italic">"{item.summary}"</p>
-                      <p className="text-xs text-gray-500 leading-relaxed border-t border-white/5 pt-3 group-hover:border-blue-500/30 transition-colors">{item.details}</p>
+                      <p className="text-xs text-gray-500 leading-relaxed border-t border-white/5 pt-3 group-hover:border-blue-500/30 transition-colors mb-5">{item.details}</p>
                     </div>
+                    {item.image && (
+                      <div className="relative z-10 mt-auto pt-2">
+                        <button 
+                          onClick={() => setSelectedCert(item.image)}
+                          className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/20 hover:text-white transition-colors"
+                        >
+                          <Award className="w-3.5 h-3.5" /> View Certificate
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </motion.div>
@@ -361,68 +353,65 @@ function About() {
                 exit={{ opacity: 0, y: -10 }}
                 className="space-y-6"
               >
-                <div className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">Creative Director & Host</h3>
-                      <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">2022 — 2025</span>
-                    </div>
-                    <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">UniPin (Work From Home)</p>
-                    <p className="text-gray-400 leading-relaxed text-sm font-medium">
-                      Directed end-to-end concepts for virtual international events, managing remote teams and professional broadcast flows. Developed engaging scripts, oversaw visual asset production, and acted as a front-facing host for major esports events. Leveraged remote collaboration tools to coordinate multi-regional teams efficiently.
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-6">
-                      {['Creative Direction', 'Esports Casting', 'Audio Engineering', 'Live Performance', 'Remote Management'].map(s => (
-                        <span key={s} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">Multimedia & IT Support Intern</h3>
-                      <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">2024</span>
-                    </div>
-                    <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">PT VEGA Instruments Indonesia</p>
-                    <p className="text-gray-400 leading-relaxed text-sm font-medium">
-                      Applied <span className="text-white">AI for financial data efficiency</span>, streamlining corporate finance workflows and reducing manual data entry overhead. Designed high-quality visual assets and managed multimedia production for corporate events, including comprehensive HSE (Health, Safety, and Environment) documentation and promotional materials.
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-6">
-                      {['IT Support', 'AI Data Efficiency', 'Visual Asset Design', 'HSE Documentation'].map(s => (
-                        <span key={s} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s}</span>
-                      ))}
+                {experienceData.map((item, idx) => (
+                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative z-10">
+                      <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
+                        <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">{item.title}</h3>
+                        <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">{item.date}</span>
+                      </div>
+                      <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">{item.subtitle}</p>
+                      <p className="text-gray-400 leading-relaxed text-sm font-medium">{item.description}</p>
+                      <div className="flex flex-wrap gap-2 mt-6">
+                        {item.tags?.map((s: string) => (
+                          <span key={s} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s}</span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative z-10">
-                    <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                      <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">Library System Management</h3>
-                      <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">2019</span>
-                    </div>
-                    <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">Internship at IISIP Jakarta</p>
-                    <p className="text-gray-400 leading-relaxed text-sm font-medium">
-                      Managed and optimized library lending systems, ensuring accurate tracking of assets and user records. Provided critical on-site technical support for library IT infrastructure, performing routine maintenance and troubleshooting hardware and software issues to maintain high availability.
-                    </p>
-                    <div className="flex flex-wrap gap-2 mt-6">
-                      {['System Administration', 'Database Management', 'IT Support'].map(s => (
-                        <span key={s} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                ))}
               </motion.div>
             )}
             </AnimatePresence>
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {selectedCert && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedCert(null)}
+              className="absolute inset-0 bg-black/95 backdrop-blur-xl cursor-pointer" 
+            />
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 30 }}
+              transition={{ type: "spring", damping: 25, stiffness: 350 }}
+              className="relative w-full max-w-4xl max-h-[90vh] glass rounded-[32px] md:rounded-[40px] overflow-hidden flex flex-col border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.8)] z-10"
+            >
+              <button 
+                onClick={() => setSelectedCert(null)}
+                className="absolute top-4 right-4 md:top-6 md:right-6 z-50 p-2 md:p-3 rounded-full bg-black/40 text-white backdrop-blur-md border border-white/10 hover:bg-black/60 transition-all hover:scale-110 active:scale-95"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="w-full h-full overflow-y-auto no-scrollbar p-4 md:p-12 flex items-center justify-center bg-slate-950/40">
+                <img 
+                  src={selectedCert} 
+                  alt="Certificate" 
+                  className="max-w-full max-h-[80vh] object-contain rounded-xl border border-white/10 shadow-2xl" 
+                />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
@@ -472,33 +461,20 @@ function SkillBar({ skill, level, color }: { skill: string; level: number; color
 }
 
 function Skills() {
-  const skillGroups = [
-    {
-      title: "Technical IT",
-      skills: ["IT Support Infrastructure", "System Administration", "Database Management", "MikroTik Networking", "Hardware & PC Optimization"]
-    },
-    {
-      title: "Automation & Dev",
-      skills: ["n8n Workflow Automation", "AI & ML Implementation", "Laravel (PHP)", "Node.js (JavaScript/TS)", "PostgreSQL/MySQL", "Proxmox Virtualization"]
-    },
-    {
-      title: "Strategic Administration",
-      skills: ["Office Management", "SAP & ERP Operations", "Strategic Planning", "Advanced MS Office & Google Workspace", "Secretarial Procedures", "Correspondence & Filing"]
-    },
-    {
-      title: "Creative Production",
-      skills: ["Creative Direction", "Video Editing (Premiere/CapCut)", "Audio Engineering (FL Studio)", "Mixing & Mastering", "UI/UX Design (Figma/Canva)", "Fluent in English"]
-    }
-  ];
+  const [skillGroups, setSkillGroups] = useState<any[]>([]);
+  const [proficiencies, setProficiencies] = useState<any[]>([]);
 
-  const proficiencies = [
-    { skill: "Automation", level: 98, color: "bg-blue-500" },
-    { skill: "IT Support", level: 95, color: "bg-blue-400" },
-    { skill: "Web Dev", level: 90, color: "bg-blue-600" },
-    { skill: "Administration", level: 94, color: "bg-cyan-500" },
-    { skill: "Multimedia", level: 88, color: "bg-indigo-400" },
-    { skill: "English", level: 100, color: "bg-sky-500" }
-  ];
+  useEffect(() => {
+    fetch('/api/skillGroups')
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data)) setSkillGroups(data) })
+      .catch(console.error);
+
+    fetch('/api/proficiencies')
+      .then(res => res.json())
+      .then(data => { if (Array.isArray(data)) setProficiencies(data) })
+      .catch(console.error);
+  }, []);
 
   const radarData = proficiencies.map(p => ({
     subject: p.skill,
@@ -745,7 +721,7 @@ function ProjectModal({ project, isOpen, onClose }: { project: Project | null; i
                   </section>
 
                   <section>
-                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-5">Applied Technologies</h3>
+                    <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-5">Applied Technologies / Skills</h3>
                     <div className="flex flex-wrap gap-2">
                       {project.technologies.map((tech) => (
                         <span key={tech} className="text-[10px] uppercase tracking-widest font-black px-3 py-1.5 rounded bg-white/5 text-gray-500 border border-white/10 hover:border-blue-500/30 hover:text-blue-400 hover:bg-blue-500/5 transition-all cursor-default">
@@ -755,12 +731,12 @@ function ProjectModal({ project, isOpen, onClose }: { project: Project | null; i
                     </div>
                   </section>
 
-                  <div className="pt-8 border-t border-white/5 text-center md:text-left">
+                  <div className="pt-8 border-t border-white/5 flex justify-center w-full mt-4">
                     <button 
                       onClick={onClose}
-                      className="px-10 py-5 rounded-full bg-white text-black text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-xl shadow-white/5 w-full md:w-auto"
+                      className="group flex items-center justify-center gap-3 px-10 py-4 rounded-full bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_40px_rgba(59,130,246,0.8)] hover:bg-blue-500 hover:-translate-y-1 transition-all w-full md:w-auto"
                     >
-                      Exit
+                      Exit Preview <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
                     </button>
                   </div>
                 </div>
@@ -835,11 +811,21 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
 function Portfolio() {
   const [filter, setFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const categories = ['All', 'Web Dev', 'Automation', 'Creative', 'Hardware', 'Administration'];
+  const [projects, setProjects] = useState<Project[]>(PROJECTS);
+  const categories = ['All', 'Web Dev', 'Automation', 'Creative', 'Hardware', 'Administration', 'Other'];
+
+  useEffect(() => {
+    fetch('/api/projects')
+      .then(res => res.json())
+      .then(data => {
+        if(data && data.length > 0) setProjects(data);
+      })
+      .catch(err => console.error("Failed to load backend projects:", err));
+  }, []);
 
   const filteredProjects = filter === 'All' 
-    ? PROJECTS 
-    : PROJECTS.filter(p => p.category === filter);
+    ? projects 
+    : projects.filter(p => p.category === filter);
 
   return (
     <section id="portfolio" className="py-16 md:py-24 px-6 max-w-7xl mx-auto">
@@ -964,6 +950,7 @@ function Footer() {
            <a href="#about" className="hover:text-white transition-colors">About</a>
            <a href="#portfolio" className="hover:text-white transition-colors">Projects</a>
            <a href="mailto:fantaseaindo@gmail.com" className="hover:text-white transition-colors">Contact</a>
+           <a href="/admin" className="hover:text-blue-400 text-blue-500/50 transition-colors" title="Admin Login">Admin</a>
         </div>
       </div>
     </footer>
@@ -973,6 +960,8 @@ function Footer() {
 // --- Main App ---
 
 export default function App() {
+  const { scrollYProgress } = useScroll();
+
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
       if ((e.target as HTMLElement).tagName === 'IMG') {
@@ -997,6 +986,11 @@ export default function App() {
 
   return (
     <div className="relative font-sans antialiased text-white selection:bg-blue-500/30 selection:text-blue-200">
+      {/* Scroll Progress Indicator */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 z-[100] origin-left"
+        style={{ scaleX: scrollYProgress }}
+      />
       <Navbar />
       <main>
         <Hero />
@@ -1019,11 +1013,11 @@ export default function App() {
           }}
         />
         
-        {/* Fluid Accent Curves (Blue & Purple) */}
+        {/* Fluid Accent Curves (Blue & Cyan) */}
         <div 
           className="absolute inset-0 opacity-[0.1]"
           style={{
-             backgroundImage: `url("data:image/svg+xml,%3Csvg width='1000' height='1000' viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-200 300 C 100 200, 300 400, 500 200 C 700 0, 900 200, 1100 300' stroke='%233b82f6' fill='none' stroke-width='2' opacity='0.6'/%3E%3Cpath d='M-100 850 C 200 750, 400 950, 600 750 C 800 550, 1000 750, 1200 850' stroke='%238b5cf6' fill='none' stroke-width='2' opacity='0.6'/%3E%3Cpath d='M200 -100 C 400 100, 600 -100, 800 100 C 1000 300, 1200 100, 1400 -100' stroke='%233b82f6' fill='none' stroke-width='1' opacity='0.4'/%3E%3C/svg%3E")`,
+             backgroundImage: `url("data:image/svg+xml,%3Csvg width='1000' height='1000' viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-200 300 C 100 200, 300 400, 500 200 C 700 0, 900 200, 1100 300' stroke='%233b82f6' fill='none' stroke-width='2' opacity='0.6'/%3E%3Cpath d='M-100 850 C 200 750, 400 950, 600 750 C 800 550, 1000 750, 1200 850' stroke='%2322d3ee' fill='none' stroke-width='2' opacity='0.6'/%3E%3Cpath d='M200 -100 C 400 100, 600 -100, 800 100 C 1000 300, 1200 100, 1400 -100' stroke='%233b82f6' fill='none' stroke-width='1' opacity='0.4'/%3E%3C/svg%3E")`,
              backgroundSize: '100% 100%',
              backgroundPosition: 'center center'
           }}
