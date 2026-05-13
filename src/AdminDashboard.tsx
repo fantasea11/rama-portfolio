@@ -22,6 +22,10 @@ export default function AdminDashboard() {
   // Dashboard State
   const [activeTab, setActiveTab] = useState<'projects' | 'education' | 'experience' | 'certification' | 'seminars' | 'settings'>('projects');
   
+  // Settings Data
+  const [projectCategories, setProjectCategories] = useState<string[]>(['Web Dev', 'Automation', 'Creative', 'Hardware', 'Administration', 'Other']);
+  const [newCategory, setNewCategory] = useState('');
+
   // Collections State
   const [dataStore, setDataStore] = useState<Record<string, any[]>>({
     projects: [],
@@ -37,6 +41,10 @@ export default function AdminDashboard() {
   const [editingItem, setEditingItem] = useState<any | null>(null);
   const [itemToDelete, setItemToDelete] = useState<{ id: string, collection: string } | null>(null);
   
+  // Custom Modal/Alert State
+  const [alertConfig, setAlertConfig] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [confirmConfig, setConfirmConfig] = useState<{ message: string; onConfirm: () => void } | null>(null);
+
   // Form State
   const [formData, setFormData] = useState<any>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -96,6 +104,9 @@ export default function AdminDashboard() {
       const res = await fetch(`${API_URL}/settings`);
       const data = await res.json();
       if (data.profilePicture) setProfilePicture(data.profilePicture);
+      if (data.projectCategories && data.projectCategories.length > 0) {
+        setProjectCategories(data.projectCategories);
+      }
     } catch (err) {
       console.error("Failed to fetch settings", err);
     }
@@ -180,10 +191,11 @@ export default function AdminDashboard() {
         } else {
           setFormData((prev: any) => ({ ...prev, image: data.url }));
         }
+        setAlertConfig({ message: 'Image uploaded successfully!', type: 'success' });
       }
     } catch (err) {
       console.error('Upload failed', err);
-      alert('Failed to upload image');
+      setAlertConfig({ message: 'Failed to upload image', type: 'error' });
     } finally {
       setUploading(false);
     }
@@ -198,13 +210,18 @@ export default function AdminDashboard() {
   };
 
   const handleSaveItem = async () => {
-    if (!formData.title) {
-      alert("Title is required.");
+    // For proficiencies, we might be checking 'title' which doesn't exist (it's 'skill')
+    const titleField = activeTab === 'proficiencies' ? 'skill' : 'title';
+    if (!formData[titleField]) {
+      setAlertConfig({ message: `${titleField.charAt(0).toUpperCase() + titleField.slice(1)} is required.`, type: 'error' });
       return;
     }
 
     try {
       const token = localStorage.getItem('adminToken');
+      // Ensure the payload has 'title' if it's not proficiencies, or handle accordingly
+      const payload = { ...formData };
+      
       if (editingItem) {
         const res = await fetch(`${API_URL}/${activeTab}/${editingItem.id}`, {
           method: 'PUT',
@@ -212,7 +229,7 @@ export default function AdminDashboard() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(payload)
         });
         if (res.ok) fetchData();
       } else {
@@ -222,14 +239,14 @@ export default function AdminDashboard() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify(formData)
+          body: JSON.stringify(payload)
         });
         if (res.ok) fetchData();
       }
       handleCloseModal();
     } catch (err) {
       console.error("Save failed", err);
-      alert("Failed to save item.");
+      setAlertConfig({ message: "Failed to save item.", type: 'error' });
     }
   };
 
@@ -241,9 +258,13 @@ export default function AdminDashboard() {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (res.ok) fetchData();
+      if (res.ok) {
+        fetchData();
+        setAlertConfig({ message: "Item deleted successfully", type: 'success' });
+      }
     } catch (err) {
       console.error("Delete failed", err);
+      setAlertConfig({ message: "Delete failed", type: 'error' });
     } finally {
       setItemToDelete(null);
     }
@@ -269,13 +290,13 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (data.success) {
-        alert('Credentials updated successfully! Please login again.');
-        handleLogout();
+        setAlertConfig({ message: 'Credentials updated successfully! Please login again.', type: 'success' });
+        setTimeout(handleLogout, 2000);
       } else {
-        alert(data.message || 'Update failed. Check your old credentials.');
+        setAlertConfig({ message: data.message || 'Update failed. Check your old credentials.', type: 'error' });
       }
     } catch (err) {
-      alert('Server error.');
+      setAlertConfig({ message: 'Server error.', type: 'error' });
     }
   };
 
@@ -311,14 +332,58 @@ export default function AdminDashboard() {
         
         if (settingsData.success) {
           setProfilePicture(uploadData.url);
-          alert('Profile picture updated!');
+          setAlertConfig({ message: 'Profile picture updated!', type: 'success' });
         }
       }
     } catch (err) {
       console.error('Upload failed', err);
-      alert('Failed to update profile picture');
+      setAlertConfig({ message: 'Failed to update profile picture', type: 'error' });
     } finally {
       setUploadingProfile(false);
+    }
+  };
+
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return;
+    const updatedCategories = [...projectCategories, newCategory.trim()];
+    try {
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch(`${API_URL}/settings`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ projectCategories: updatedCategories })
+      });
+      if (res.ok) {
+        setProjectCategories(updatedCategories);
+        setNewCategory('');
+        setAlertConfig({ message: 'Category added!', type: 'success' });
+      }
+    } catch (err) {
+      setAlertConfig({ message: 'Failed to add category', type: 'error' });
+    }
+  };
+
+  const handleRemoveCategory = async (catToRemove: string) => {
+    const updatedCategories = projectCategories.filter(cat => cat !== catToRemove);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch(`${API_URL}/settings`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ projectCategories: updatedCategories })
+      });
+      if (res.ok) {
+        setProjectCategories(updatedCategories);
+        setAlertConfig({ message: 'Category removed!', type: 'success' });
+      }
+    } catch (err) {
+      setAlertConfig({ message: 'Failed to remove category', type: 'error' });
     }
   };
 
@@ -605,6 +670,44 @@ export default function AdminDashboard() {
                 </button>
               </form>
               </div>
+
+              <div>
+                <h2 className="text-3xl font-black uppercase tracking-tighter font-display mb-2">Project Categories</h2>
+                <p className="text-gray-400 font-medium mb-6">Manage categories for your projects.</p>
+                
+                <div className="glass p-8 rounded-[32px] border border-white/5 space-y-6">
+                  <div className="flex gap-4">
+                    <input 
+                      type="text" 
+                      value={newCategory}
+                      onChange={e => setNewCategory(e.target.value)}
+                      placeholder="New category name..."
+                      className="flex-1 bg-slate-900/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm"
+                      onKeyDown={e => e.key === 'Enter' && handleAddCategory()}
+                    />
+                    <button 
+                      onClick={handleAddCategory}
+                      className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition-colors flex items-center gap-2"
+                    >
+                      <Plus className="w-4 h-4" /> Add
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    {projectCategories.map(cat => (
+                      <div key={cat} className="flex items-center gap-2 bg-slate-900/60 border border-white/10 px-4 py-2 rounded-xl group hover:border-blue-500/30 transition-colors">
+                        <span className="text-sm font-bold text-gray-300">{cat}</span>
+                        <button 
+                          onClick={() => handleRemoveCategory(cat)}
+                          className="p-1 rounded-full hover:bg-red-500/20 text-gray-500 hover:text-red-400 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -669,13 +772,10 @@ export default function AdminDashboard() {
                   {activeTab === 'projects' && (
                     <div className="space-y-2">
                       <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Category</label>
-                      <select value={formData.category || 'Web Dev'} onChange={e => setFormData({...formData, category: e.target.value as any})} className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none cursor-pointer">
-                        <option value="Web Dev">Web Dev</option>
-                        <option value="Automation">Automation</option>
-                        <option value="Creative">Creative</option>
-                        <option value="Hardware">Hardware</option>
-                        <option value="Administration">Administration</option>
-                        <option value="Other">Other</option>
+                      <select value={formData.category || (projectCategories[0] || 'Other')} onChange={e => setFormData({...formData, category: e.target.value as any})} className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none cursor-pointer">
+                        {projectCategories.map(cat => (
+                          <option key={cat} value={cat}>{cat}</option>
+                        ))}
                       </select>
                     </div>
                   )}
@@ -845,10 +945,10 @@ export default function AdminDashboard() {
       {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {itemToDelete && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setProjectToDelete(null)}
+              onClick={() => setItemToDelete(null)}
               className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             />
             <motion.div
@@ -869,6 +969,35 @@ export default function AdminDashboard() {
                   Yes, Delete
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Alert Modal */}
+      <AnimatePresence>
+        {alertConfig && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className={`pointer-events-auto min-w-[300px] glass p-6 rounded-[24px] border shadow-2xl flex flex-col items-center text-center ${
+                alertConfig.type === 'error' ? 'border-red-500/30' : 'border-blue-500/30'
+              }`}
+            >
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
+                alertConfig.type === 'error' ? 'bg-red-500/10 text-red-400' : 'bg-blue-500/10 text-blue-400'
+              }`}>
+                {alertConfig.type === 'error' ? <X className="w-6 h-6" /> : <Activity className="w-6 h-6" />}
+              </div>
+              <p className="text-white font-bold mb-6">{alertConfig.message}</p>
+              <button 
+                onClick={() => setAlertConfig(null)}
+                className="px-8 py-2 bg-white text-black font-black uppercase tracking-widest text-[10px] rounded-lg hover:scale-105 transition-transform"
+              >
+                Dismiss
+              </button>
             </motion.div>
           </div>
         )}

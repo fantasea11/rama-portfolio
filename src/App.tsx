@@ -68,7 +68,7 @@ function Hero() {
   }, []);
 
   return (
-    <section className="relative min-h-[85vh] md:min-h-screen flex flex-col items-center justify-center pt-20 md:pt-28 px-6">
+    <section className="relative min-h-[85vh] md:min-h-screen flex flex-col items-center justify-center pt-20 md:pt-28 px-6 overflow-hidden">
       {/* Background radial glow */}
       <div className="absolute top-1/2 left-1/2 w-full max-w-[500px] aspect-square bg-blue-600/15 rounded-full blur-[80px] md:blur-[120px] pointer-events-none animate-breathing-glow" />
       
@@ -76,13 +76,13 @@ function Hero() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="text-center z-10 flex flex-col items-center"
+        className="text-center z-10 flex flex-col items-center w-full max-w-4xl mx-auto"
       >
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="relative w-32 h-32 md:w-44 md:h-44 mb-8 p-1.5 glass rounded-full"
+          className="relative w-32 h-32 md:w-44 md:h-44 mb-8 p-1.5 glass rounded-full mx-auto"
         >
           <img 
             src={profilePicture} 
@@ -170,12 +170,22 @@ function About() {
   const [experienceData, setExperienceData] = useState<any[]>([]);
   const [certificationData, setCertificationData] = useState<any[]>([]);
   const [seminarsData, setSeminarsData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/education').then(res => res.json()).then(data => { if(Array.isArray(data)) setEducationData(data) }).catch(console.error);
-    fetch('/api/experience').then(res => res.json()).then(data => { if(Array.isArray(data)) setExperienceData(data) }).catch(console.error);
-    fetch('/api/certification').then(res => res.json()).then(data => { if(Array.isArray(data)) setCertificationData(data) }).catch(console.error);
-    fetch('/api/seminars').then(res => res.json()).then(data => { if(Array.isArray(data)) setSeminarsData(data) }).catch(console.error);
+    setIsLoading(true);
+    Promise.all([
+      fetch('/api/education').then(res => res.json()),
+      fetch('/api/experience').then(res => res.json()),
+      fetch('/api/certification').then(res => res.json()),
+      fetch('/api/seminars').then(res => res.json())
+    ]).then(([edu, exp, cert, sem]) => {
+      if(Array.isArray(edu)) setEducationData(edu);
+      if(Array.isArray(exp)) setExperienceData(exp);
+      if(Array.isArray(cert)) setCertificationData(cert);
+      if(Array.isArray(sem)) setSeminarsData(sem);
+    }).catch(console.error)
+    .finally(() => setIsLoading(false));
   }, []);
 
   const tabs = [
@@ -188,11 +198,12 @@ function About() {
   return (
     <section id="about" className="py-16 md:py-24 px-6 max-w-6xl mx-auto">
       <SectionHeading 
-        title="About Me" 
+        title="ABOUT ME" 
         subtitle="Bridging the gap between operational management and technical automation. With a highly versatile skill set spanning Informatics, Office Administration, and Creative Production, I quickly adapt to new environments and master emerging tools. I thrive on identifying process gaps and solving them through high-efficiency AI workflows, always driven by a fast-paced eagerness to learn, innovate, and deliver impactful results."
       />
       
       <div className="flex flex-col md:flex-row gap-6 md:gap-12 mt-10 md:mt-16">
+        {/* Navigation Tabs */}
         <div className="grid grid-cols-2 md:flex md:flex-col gap-2 md:gap-3 md:w-1/3">
           {tabs.map((tab) => (
             <button
@@ -222,158 +233,172 @@ function About() {
         <div className="md:w-2/3 bg-slate-900/40 p-5 md:p-12 rounded-[28px] md:rounded-[40px] min-h-[350px] md:min-h-[400px] border border-white/5 hover:border-blue-500/30 transition-all duration-500 relative overflow-hidden group hover:shadow-2xl hover:shadow-blue-900/20">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="relative z-10 h-full">
-            <AnimatePresence mode="wait">
-            {activeTab === 'education' && (
-              <motion.div
-                key="edu"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="space-y-6"
-              >
-                {educationData.map((item, idx) => (
-                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10">
-                      <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
-                        <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words font-display">{item.title}</h3>
-                        <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">{item.date}</span>
-                      </div>
-                      <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">{item.subtitle}</p>
-                      <p className="text-gray-400 leading-relaxed text-sm font-medium">{item.description}</p>
-                      <div className="flex flex-wrap gap-2 mt-6">
-                         {item.tags?.map((tag: string) => (
-                           <span key={tag} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tag}</span>
-                         ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-
-            {activeTab === 'certification' && (
-              <motion.div
-                key="cert"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="space-y-6"
-              >
-                {certificationData.map((cert, idx) => (
-                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group flex flex-col">
-                    <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10 flex-1">
-                      <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                        <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">{cert.title}</h3>
-                      </div>
-                      <p className="text-blue-400 text-xs font-bold mb-6 tracking-widest uppercase">{cert.subtitle}</p>
-                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-400 text-sm font-medium mb-5">
-                        {cert.features?.map((feature: string, fIdx: number) => (
-                          <li key={fIdx} className="flex items-center gap-3">
-                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    {cert.image && (
-                      <div className="relative z-10 mt-auto pt-2">
-                        <button 
-                          onClick={() => setSelectedCert(cert.image)}
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/20 hover:text-white transition-colors w-max"
-                        >
-                          <Award className="w-3.5 h-3.5" /> View Certificate
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </motion.div>
-            )}
-
-            {activeTab === 'seminars' && (
-              <motion.div
-                key="seminars"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="space-y-6"
-              >
-                <div className="relative p-8 overflow-hidden bg-slate-900/40 rounded-[24px] border border-white/5 mb-8 group">
-                  <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
-                    <Layers className="w-16 h-16 text-blue-400" />
-                  </div>
-                  <div className="relative z-10">
-                    <p className="text-blue-400 font-black mb-3 flex items-center gap-3 uppercase tracking-widest text-[10px]">
-                      <span className="w-8 h-[2px] bg-blue-500/40 rounded-full"></span>
-                      Continuous Growth & Innovation
-                    </p>
-                    <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
-                      A curated collection of specialized certificates and academic training focused on 
-                      <span className="text-white"> AI-driven automation</span>, <span className="text-white">Applied Machine Learning</span>, 
-                      and <span className="text-white">Strategic Creative Direction</span>. These represent my ongoing journey 
-                      into the future of technical efficiency.
-                    </p>
-                  </div>
-                </div>
-                {seminarsData.map((item, idx) => (
-                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group flex flex-col">
-                    <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="relative z-10 flex-1">
-                      <div className="flex flex-col md:flex-row md:justify-between items-start mb-3">
-                        <div className="space-y-1">
-                          <h4 className="font-black text-white text-base md:text-lg uppercase leading-tight group-hover:text-blue-400 transition-colors pr-4">{item.title}</h4>
-                          <p className="text-[10px] text-blue-500 font-bold uppercase tracking-widest">{item.issuer}</p>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full min-h-[300px]">
+                <div className="w-8 h-8 border-2 border-blue-500/30 border-t-blue-500 rounded-full animate-spin" />
+              </div>
+            ) : (
+              <AnimatePresence mode="wait">
+              {activeTab === 'education' && (
+                <motion.div
+                  key="edu"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-6"
+                >
+                  {educationData.length > 0 ? educationData.map((item, idx) => (
+                    <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative z-10">
+                        <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2 gap-1 md:gap-4">
+                          <h3 className="text-lg md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors break-words font-display">{item.title}</h3>
+                          <span className="text-[9px] md:text-[10px] font-black text-gray-500 tracking-[0.1em] md:tracking-[0.2em] uppercase whitespace-nowrap">{item.date}</span>
                         </div>
-                        <span className="text-[10px] font-black text-gray-500 bg-white/5 px-3 py-1 rounded-full uppercase tracking-widest whitespace-nowrap mt-2 md:mt-0 border border-white/10">{item.date}</span>
+                        <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">{item.subtitle}</p>
+                        <p className="text-gray-400 leading-relaxed text-sm font-medium">{item.description}</p>
+                        <div className="flex flex-wrap gap-2 mt-6">
+                           {item.tags?.map((tag: string) => (
+                             <span key={tag} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{tag}</span>
+                           ))}
+                        </div>
                       </div>
-                      <p className="text-sm font-medium text-gray-300 mb-3 italic">"{item.summary}"</p>
-                      <p className="text-xs text-gray-500 leading-relaxed border-t border-white/5 pt-3 group-hover:border-blue-500/30 transition-colors mb-5">{item.details}</p>
                     </div>
-                    {item.image && (
-                      <div className="relative z-10 mt-auto pt-2">
-                        <button 
-                          onClick={() => setSelectedCert(item.image)}
-                          className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/20 hover:text-white transition-colors"
-                        >
-                          <Award className="w-3.5 h-3.5" /> View Certificate
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </motion.div>
-            )}
+                  )) : (
+                    <div className="flex items-center justify-center py-20 text-gray-500 uppercase font-black tracking-widest text-xs">No entries found</div>
+                  )}
+                </motion.div>
+              )}
 
-            {activeTab === 'experience' && (
-              <motion.div
-                key="exp"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="space-y-6"
-              >
-                {experienceData.map((item, idx) => (
-                  <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              {activeTab === 'certification' && (
+                <motion.div
+                  key="cert"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-6"
+                >
+                  {certificationData.length > 0 ? certificationData.map((cert, idx) => (
+                    <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group flex flex-col">
+                      <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative z-10 flex-1">
+                        <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
+                          <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">{cert.title}</h3>
+                        </div>
+                        <p className="text-blue-400 text-xs font-bold mb-6 tracking-widest uppercase">{cert.subtitle}</p>
+                        <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-400 text-sm font-medium mb-5">
+                          {cert.features?.map((feature: string, fIdx: number) => (
+                            <li key={fIdx} className="flex items-center gap-3">
+                               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" /> {feature}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      {cert.image && (
+                        <div className="relative z-10 mt-auto pt-2">
+                          <button 
+                            onClick={() => setSelectedCert(cert.image)}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/20 hover:text-white transition-colors w-max"
+                          >
+                            <Award className="w-3.5 h-3.5" /> View Certificate
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )) : (
+                    <div className="flex items-center justify-center py-20 text-gray-500 uppercase font-black tracking-widest text-xs">No entries found</div>
+                  )}
+                </motion.div>
+              )}
+
+              {activeTab === 'seminars' && (
+                <motion.div
+                  key="seminars"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-6"
+                >
+                  <div className="relative p-8 overflow-hidden bg-slate-900/40 rounded-[24px] border border-white/5 mb-8 group">
+                    <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+                      <Layers className="w-16 h-16 text-blue-400" />
+                    </div>
                     <div className="relative z-10">
-                      <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
-                        <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">{item.title}</h3>
-                        <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">{item.date}</span>
-                      </div>
-                      <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">{item.subtitle}</p>
-                      <p className="text-gray-400 leading-relaxed text-sm font-medium">{item.description}</p>
-                      <div className="flex flex-wrap gap-2 mt-6">
-                        {item.tags?.map((s: string) => (
-                          <span key={s} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s}</span>
-                        ))}
-                      </div>
+                      <p className="text-blue-400 font-black mb-3 flex items-center gap-3 uppercase tracking-widest text-[10px]">
+                        <span className="w-8 h-[2px] bg-blue-500/40 rounded-full"></span>
+                        Continuous Growth & Innovation
+                      </p>
+                      <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
+                        A curated collection of specialized certificates and academic training focused on 
+                        <span className="text-white"> AI-driven automation</span>, <span className="text-white">Applied Machine Learning</span>, 
+                        and <span className="text-white">Strategic Creative Direction</span>. These represent my ongoing journey 
+                        into the future of technical efficiency.
+                      </p>
                     </div>
                   </div>
-                ))}
-              </motion.div>
+                  {seminarsData.length > 0 ? seminarsData.map((item, idx) => (
+                    <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group flex flex-col">
+                      <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative z-10 flex-1">
+                        <div className="flex flex-col md:flex-row md:justify-between items-start mb-3">
+                          <div className="space-y-1">
+                            <h4 className="font-black text-white text-base md:text-lg uppercase leading-tight group-hover:text-blue-400 transition-colors pr-4">{item.title}</h4>
+                            <p className="text-[10px] text-blue-500 font-bold uppercase tracking-widest">{item.issuer}</p>
+                          </div>
+                          <span className="text-[10px] font-black text-gray-500 bg-white/5 px-3 py-1 rounded-full uppercase tracking-widest whitespace-nowrap mt-2 md:mt-0 border border-white/10">{item.date}</span>
+                        </div>
+                        <p className="text-sm font-medium text-gray-300 mb-3 italic">"{item.summary}"</p>
+                        <p className="text-xs text-gray-500 leading-relaxed border-t border-white/5 pt-3 group-hover:border-blue-500/30 transition-colors mb-5">{item.details}</p>
+                      </div>
+                      {item.image && (
+                        <div className="relative z-10 mt-auto pt-2">
+                          <button 
+                            onClick={() => setSelectedCert(item.image)}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/20 hover:text-white transition-colors"
+                          >
+                            <Award className="w-3.5 h-3.5" /> View Certificate
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )) : (
+                    <div className="flex items-center justify-center py-20 text-gray-500 uppercase font-black tracking-widest text-xs">No entries found</div>
+                  )}
+                </motion.div>
+              )}
+
+              {activeTab === 'experience' && (
+                <motion.div
+                  key="exp"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-6"
+                >
+                  {experienceData.length > 0 ? experienceData.map((item, idx) => (
+                    <div key={idx} className="bg-slate-900/60 border border-white/10 rounded-[24px] p-6 hover:border-blue-500/30 transition-all duration-300 relative overflow-hidden group">
+                      <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="relative z-10">
+                        <div className="flex flex-col md:flex-row md:justify-between tracking-tight mb-2">
+                          <h3 className="text-xl md:text-2xl font-black text-white uppercase group-hover:text-blue-400 transition-colors font-display">{item.title}</h3>
+                          <span className="text-[10px] font-black text-gray-500 tracking-[0.2em] uppercase mt-1 md:mt-0">{item.date}</span>
+                        </div>
+                        <p className="text-blue-400 text-xs font-bold mb-4 tracking-widest uppercase">{item.subtitle}</p>
+                        <p className="text-gray-400 leading-relaxed text-sm font-medium">{item.description}</p>
+                        <div className="flex flex-wrap gap-2 mt-6">
+                          {item.tags?.map((s: string) => (
+                            <span key={s} className="px-3 py-1 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="flex items-center justify-center py-20 text-gray-500 uppercase font-black tracking-widest text-xs">No entries found</div>
+                  )}
+                </motion.div>
+              )}
+              </AnimatePresence>
             )}
-            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -463,17 +488,18 @@ function SkillBar({ skill, level, color }: { skill: string; level: number; color
 function Skills() {
   const [skillGroups, setSkillGroups] = useState<any[]>([]);
   const [proficiencies, setProficiencies] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/skillGroups')
-      .then(res => res.json())
-      .then(data => { if (Array.isArray(data)) setSkillGroups(data) })
-      .catch(console.error);
-
-    fetch('/api/proficiencies')
-      .then(res => res.json())
-      .then(data => { if (Array.isArray(data)) setProficiencies(data) })
-      .catch(console.error);
+    setIsLoading(true);
+    Promise.all([
+      fetch('/api/skillGroups').then(res => res.json()),
+      fetch('/api/proficiencies').then(res => res.json())
+    ]).then(([groups, profs]) => {
+      if (Array.isArray(groups)) setSkillGroups(groups);
+      if (Array.isArray(profs)) setProficiencies(profs);
+    }).catch(console.error)
+    .finally(() => setIsLoading(false));
   }, []);
 
   const radarData = proficiencies.map(p => ({
@@ -491,7 +517,7 @@ function Skills() {
           viewport={{ once: true }}
         >
           <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase mb-4 font-display">
-            SKILLS & <span className="text-gradient">PROFICIENCY</span>
+            SKILLS & <span className="text-gradient">PROFICIENCIES</span>
           </h2>
           <p className="text-slate-400 text-lg max-w-xl font-medium tracking-tight">
             A cross-disciplinary toolkit combining technical infrastructure with high-end creative output.
@@ -500,62 +526,73 @@ function Skills() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
-        {/* Radar Map - Large Feature */}
-        <motion.div 
-          whileHover={{ y: -8, transition: { duration: 0.3 } }}
-          className="lg:col-span-2 lg:row-span-2 bg-slate-900/40 border border-white/5 rounded-[32px] md:rounded-[40px] p-6 md:p-8 flex flex-col items-center justify-center min-h-[350px] md:min-h-[400px] hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="text-center mb-4 relative z-10">
-            <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Competency Radar</span>
-            <h3 className="text-lg font-bold text-white mt-1 uppercase font-display">Skill Mapping</h3>
-          </div>
-          <div className="relative z-10 w-full">
-            <SkillRadar data={radarData} />
-          </div>
-        </motion.div>
-
-        {/* Proficiency Matrix - Vertical List */}
-        <motion.div 
-          whileHover={{ y: -8, transition: { duration: 0.3 } }}
-          className="lg:col-span-2 bg-slate-900/40 border border-white/5 rounded-[32px] md:rounded-[40px] p-6 md:p-10 hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden"
-        >
-          <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-10">
-              <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] font-display">Proficiency Matrix</h3>
-              <div className="h-[1px] flex-1 bg-white/10 group-hover:bg-blue-500/20 transition-colors" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 md:gap-y-8">
-              {proficiencies.map((p) => (
-                <SkillBar key={p.skill} skill={p.skill} level={p.level} color={p.color} />
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Categorical Breakdown - Bento Items */}
-        {skillGroups.map((group, i) => (
-          <motion.div 
-            key={group.title}
-            whileHover={{ y: -8, transition: { duration: 0.3 } }}
-            className={`p-8 bg-slate-900/40 border border-white/5 rounded-[32px] flex flex-col justify-between hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden ${
-              i >= 2 ? 'lg:col-span-2' : ''
-            }`}
-          >
-            <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <div className="relative z-10">
-              <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 group-hover:text-blue-400 transition-colors font-display">{group.title}</h3>
-              <div className="flex flex-wrap gap-2">
-                {group.skills.map(skill => (
-                  <span key={skill} className="px-3 py-1.5 rounded-lg bg-white/5 text-[11px] font-bold text-slate-300 border border-white/5 group-hover:border-blue-500/20 group-hover:bg-blue-500/5 transition-all">
-                    {skill}
-                  </span>
-                ))}
+        {isLoading ? (
+          <>
+            <div className="lg:col-span-2 lg:row-span-2 glass animate-pulse min-h-[400px] rounded-[40px]" />
+            <div className="lg:col-span-2 glass animate-pulse h-[200px] rounded-[40px]" />
+            <div className="lg:col-span-1 glass animate-pulse h-[150px] rounded-[32px]" />
+            <div className="lg:col-span-1 glass animate-pulse h-[150px] rounded-[32px]" />
+          </>
+        ) : (
+          <>
+            {/* Radar Map - Large Feature */}
+            <motion.div 
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
+              className="lg:col-span-2 lg:row-span-2 bg-slate-900/40 border border-white/5 rounded-[32px] md:rounded-[40px] p-6 md:p-8 flex flex-col items-center justify-center min-h-[350px] md:min-h-[400px] hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="text-center mb-4 relative z-10">
+                <span className="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] group-hover:tracking-[0.4em] transition-all">Competency Radar</span>
+                <h3 className="text-lg font-bold text-white mt-1 uppercase font-display">Skill Mapping</h3>
               </div>
-            </div>
-          </motion.div>
-        ))}
+              <div className="relative z-10 w-full">
+                {radarData.length > 0 ? <SkillRadar data={radarData} /> : <div className="h-[200px] flex items-center justify-center text-gray-600 text-[10px] font-black uppercase tracking-[0.2em]">No Data</div>}
+              </div>
+            </motion.div>
+
+            {/* Proficiency Matrix - Vertical List */}
+            <motion.div 
+              whileHover={{ y: -8, transition: { duration: 0.3 } }}
+              className="lg:col-span-2 bg-slate-900/40 border border-white/5 rounded-[32px] md:rounded-[40px] p-6 md:p-10 hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-10">
+                  <h3 className="text-xs font-black text-white uppercase tracking-[0.3em] font-display">Proficiency Matrix</h3>
+                  <div className="h-[1px] flex-1 bg-white/10 group-hover:bg-blue-500/20 transition-colors" />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 md:gap-y-8">
+                  {proficiencies.length > 0 ? proficiencies.map((p) => (
+                    <SkillBar key={p.skill} skill={p.skill} level={p.level} color={p.color} />
+                  )) : <div className="col-span-2 text-center text-gray-600 text-[10px] font-black uppercase tracking-[0.2em] py-10">No Data</div>}
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Categorical Breakdown - Bento Items */}
+            {skillGroups.map((group, i) => (
+              <motion.div 
+                key={group.title}
+                whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                className={`p-8 bg-slate-900/40 border border-white/5 rounded-[32px] flex flex-col justify-between hover:border-blue-500/30 hover:bg-slate-900/60 transition-all duration-300 group relative overflow-hidden ${
+                  i >= 2 ? 'lg:col-span-2' : ''
+                }`}
+              >
+                <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10">
+                  <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 group-hover:text-blue-400 transition-colors font-display">{group.title}</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {group.skills?.map((skill: string) => (
+                      <span key={skill} className="px-3 py-1.5 rounded-lg bg-white/5 text-[11px] font-bold text-slate-300 border border-white/5 group-hover:border-blue-500/20 group-hover:bg-blue-500/5 transition-all">
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </>
+        )}
       </div>
     </section>
   );
@@ -812,15 +849,26 @@ function Portfolio() {
   const [filter, setFilter] = useState('All');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>(PROJECTS);
-  const categories = ['All', 'Web Dev', 'Automation', 'Creative', 'Hardware', 'Administration', 'Other'];
+  const [categories, setCategories] = useState<string[]>(['All', 'Web Dev', 'Automation', 'Creative', 'Hardware', 'Administration', 'Other']);
 
   useEffect(() => {
+    // Fetch Projects
     fetch('/api/projects')
       .then(res => res.json())
       .then(data => {
         if(data && data.length > 0) setProjects(data);
       })
       .catch(err => console.error("Failed to load backend projects:", err));
+
+    // Fetch Dynamic Categories from Settings
+    fetch('/api/settings')
+      .then(res => res.json())
+      .then(data => {
+        if (data.projectCategories && data.projectCategories.length > 0) {
+          setCategories(['All', ...data.projectCategories]);
+        }
+      })
+      .catch(err => console.error("Failed to load dynamic categories:", err));
   }, []);
 
   const filteredProjects = filter === 'All' 

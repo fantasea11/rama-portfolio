@@ -65,7 +65,8 @@ const SkillGroupSchema = new mongoose.Schema({
 });
 
 const SettingsSchema = new mongoose.Schema({
-  profilePicture: String
+  profilePicture: String,
+  projectCategories: [String]
 });
 
 export const User = mongoose.model('User', UserSchema);
