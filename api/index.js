@@ -91,7 +91,7 @@ const authenticateToken = (req, res, next) => {
 
 // --- Auth Endpoints ---
 
-app.post('/api/login', async (req, res) => {
+app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
     const user = await Models.User.findOne({ username });
@@ -110,7 +110,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-app.put('/api/admin', authenticateToken, async (req, res) => {
+app.put('/admin', authenticateToken, async (req, res) => {
   const { oldUsername, oldPassword, newUsername, newPassword } = req.body;
   try {
     const user = await Models.User.findOne({ username: oldUsername });
@@ -138,7 +138,7 @@ const collectionMap = {
   skillGroups: Models.SkillGroup
 };
 
-app.get('/api/:collection', async (req, res, next) => {
+app.get('/:collection', async (req, res, next) => {
   const { collection } = req.params;
   const Model = collectionMap[collection];
   if (!Model) return next();
@@ -151,7 +151,7 @@ app.get('/api/:collection', async (req, res, next) => {
   }
 });
 
-app.post('/api/:collection', authenticateToken, async (req, res, next) => {
+app.post('/:collection', authenticateToken, async (req, res, next) => {
   const { collection } = req.params;
   const Model = collectionMap[collection];
   if (!Model) return next();
@@ -164,7 +164,7 @@ app.post('/api/:collection', authenticateToken, async (req, res, next) => {
   }
 });
 
-app.put('/api/:collection/:id', authenticateToken, async (req, res, next) => {
+app.put('/:collection/:id', authenticateToken, async (req, res, next) => {
   const { collection, id } = req.params;
   const Model = collectionMap[collection];
   if (!Model) return next();
@@ -181,7 +181,7 @@ app.put('/api/:collection/:id', authenticateToken, async (req, res, next) => {
   }
 });
 
-app.delete('/api/:collection/:id', authenticateToken, async (req, res, next) => {
+app.delete('/:collection/:id', authenticateToken, async (req, res, next) => {
   const { collection, id } = req.params;
   const Model = collectionMap[collection];
   if (!Model) return next();
@@ -200,7 +200,7 @@ app.delete('/api/:collection/:id', authenticateToken, async (req, res, next) => 
 
 // --- Settings Endpoints ---
 
-app.get('/api/settings', async (req, res) => {
+app.get('/settings', async (req, res) => {
   try {
     const settings = await Models.Settings.findOne();
     res.json(settings || { profilePicture: '/images/profile-picture-default.png' });
@@ -209,7 +209,7 @@ app.get('/api/settings', async (req, res) => {
   }
 });
 
-app.put('/api/settings', authenticateToken, async (req, res) => {
+app.put('/settings', authenticateToken, async (req, res) => {
   try {
     const settings = await Models.Settings.findOneAndUpdate({}, req.body, { upsert: true, new: true });
     res.json({ success: true, settings });
@@ -220,7 +220,7 @@ app.put('/api/settings', authenticateToken, async (req, res) => {
 
 // --- Upload Endpoint ---
 
-app.post('/api/upload', authenticateToken, upload.single('image'), (req, res) => {
+app.post('/upload', authenticateToken, upload.single('image'), (req, res) => {
   if (req.file) {
     res.json({ success: true, url: `/uploads/${req.file.filename}` });
   } else {
