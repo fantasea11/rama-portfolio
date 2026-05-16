@@ -65,7 +65,18 @@ const SkillGroupSchema = new mongoose.Schema({
 });
 
 const SettingsSchema = new mongoose.Schema({
-  profilePicture: String
+  profilePicture: String,
+  projectCategories: [String],
+  instagram: String,
+  instagramName: String,
+  linkedin: String,
+  linkedinName: String,
+  github: String,
+  githubName: String,
+  discord: String,
+  discordName: String,
+  tiktok: String,
+  tiktokName: String
 });
 
 export const User = mongoose.model('User', UserSchema);

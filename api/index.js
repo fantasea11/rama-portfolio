@@ -161,11 +161,80 @@ router.delete('/:collection/:id', authenticateToken, async (req, res, next) => {
 });
 
 router.get('/settings', async (req, res) => {
-  try { res.json(await Models.Settings.findOne() || { profilePicture: '/images/profile-picture-default.png' }); } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+  try {
+    let settings = await Models.Settings.findOne();
+    
+    const defaultSettings = {
+      profilePicture: '/images/profile-picture-default.png',
+      instagram: '',
+      instagramName: '',
+      linkedin: '',
+      linkedinName: '',
+      github: '',
+      githubName: '',
+      discord: '',
+      discordName: '',
+      tiktok: '',
+      tiktokName: ''
+    };
+
+    if (!settings) {
+      settings = await Models.Settings.create(defaultSettings);
+    }
+
+    res.json({ ...defaultSettings, ...settings.toObject() });
+  } catch (err) {
+    console.error('Error fetching settings:', err);
+    const defaultSettings = {
+      profilePicture: '/images/profile-picture-default.png',
+      instagram: '',
+      instagramName: '',
+      linkedin: '',
+      linkedinName: '',
+      github: '',
+      githubName: '',
+      discord: '',
+      discordName: '',
+      tiktok: '',
+      tiktokName: ''
+    };
+    res.json(defaultSettings);
+  }
 });
 
 router.put('/settings', authenticateToken, async (req, res) => {
-  try { res.json({ success: true, settings: await Models.Settings.findOneAndUpdate({}, req.body, { upsert: true, new: true }) }); } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+  try {
+    const existingSettings = await Models.Settings.findOne();
+    let updatedSettings;
+    
+    if (existingSettings) {
+      updatedSettings = await Models.Settings.findOneAndUpdate(
+        {}, 
+        { $set: req.body }, 
+        { new: true }
+      );
+    } else {
+      const defaultSettings = {
+        profilePicture: '/images/profile-picture-default.png',
+        instagram: '',
+        instagramName: '',
+        linkedin: '',
+        linkedinName: '',
+        github: '',
+        githubName: '',
+        discord: '',
+        discordName: '',
+        tiktok: '',
+        tiktokName: ''
+      };
+      updatedSettings = await Models.Settings.create({ ...defaultSettings, ...req.body });
+    }
+    
+    res.json({ success: true, settings: updatedSettings });
+  } catch (err) {
+    console.error('Error saving settings:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 router.post('/upload', authenticateToken, upload.single('image'), (req, res) => {
