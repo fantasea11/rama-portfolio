@@ -424,6 +424,7 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         setAlertConfig({ message: 'Social links saved!', type: 'success' });
+        fetchSettings();
       }
     } catch (err) {
       setAlertConfig({ message: 'Failed to save social links', type: 'error' });
