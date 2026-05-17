@@ -93,29 +93,42 @@ export default function AdminDashboard() {
   };
 
   const handleFileUpload = async (file: File) => {
+    console.log('[Upload] Starting upload for file:', file.name, 'activeTab:', activeTab);
     setUploading(true);
     const formDataObj = new FormData();
     formDataObj.append('image', file);
 
     try {
       const token = localStorage.getItem('adminToken');
+      console.log('[Upload] Token found:', !!token);
       const res = await fetch(`${API_URL}/upload`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formDataObj
       });
+      console.log('[Upload] Response status:', res.status);
       const data = await res.json();
+      console.log('[Upload] Response data:', data);
       if (data.success) {
         if (activeTab === 'projects') {
-          setFormData((prev: any) => ({ ...prev, images: [...(prev.images || []), data.url] }));
+          setFormData((prev: any) => {
+            const newImages = [...(prev.images || []), data.url];
+            console.log('[Upload] Updated formData images:', newImages);
+            return { ...prev, images: newImages };
+          });
         } else {
-          setFormData((prev: any) => ({ ...prev, image: data.url }));
+          setFormData((prev: any) => {
+            console.log('[Upload] Updated formData image:', data.url);
+            return { ...prev, image: data.url };
+          });
         }
         setAlertConfig({ message: 'Image uploaded successfully!', type: 'success' });
+      } else {
+        setAlertConfig({ message: data.message || 'Upload failed', type: 'error' });
       }
     } catch (err) {
-      console.error('Upload failed', err);
-      setAlertConfig({ message: 'Failed to upload image', type: 'error' });
+      console.error('[Upload] Failed:', err);
+      setAlertConfig({ message: 'Failed to upload image: ' + (err as Error).message, type: 'error' });
     } finally {
       setUploading(false);
     }
@@ -259,6 +272,7 @@ export default function AdminDashboard() {
   };
 
   const handleSaveItem = async () => {
+    console.log('[Save] Starting save, formData:', formData, 'activeTab:', activeTab, 'editingItem:', editingItem);
     // For proficiencies, we might be checking 'title' which doesn't exist (it's 'skill')
     const titleField = activeTab === 'proficiencies' ? 'skill' : 'title';
     if (!formData[titleField]) {
@@ -268,8 +282,10 @@ export default function AdminDashboard() {
 
     try {
       const token = localStorage.getItem('adminToken');
+      console.log('[Save] Token found:', !!token);
       // Ensure the payload has 'title' if it's not proficiencies, or handle accordingly
       const payload = { ...formData };
+      console.log('[Save] Payload:', payload);
       
       if (editingItem) {
         const res = await fetch(`${API_URL}/${activeTab}/${editingItem.id}`, {
@@ -280,6 +296,7 @@ export default function AdminDashboard() {
           },
           body: JSON.stringify(payload)
         });
+        console.log('[Save] PUT Response status:', res.status);
         if (res.ok) fetchData();
       } else {
         const res = await fetch(`${API_URL}/${activeTab}`, {
@@ -290,12 +307,15 @@ export default function AdminDashboard() {
           },
           body: JSON.stringify(payload)
         });
+        console.log('[Save] POST Response status:', res.status);
+        const data = await res.json();
+        console.log('[Save] POST Response data:', data);
         if (res.ok) fetchData();
       }
       handleCloseModal();
     } catch (err) {
-      console.error("Save failed", err);
-      setAlertConfig({ message: "Failed to save item.", type: 'error' });
+      console.error("[Save] Failed:", err);
+      setAlertConfig({ message: "Failed to save item: " + (err as Error).message, type: 'error' });
     }
   };
 

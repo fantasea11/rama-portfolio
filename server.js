@@ -186,13 +186,16 @@ app.get('/api/:collection', async (req, res, next) => {
 
 app.post('/api/:collection', authenticateToken, async (req, res, next) => {
   const { collection } = req.params;
+  console.log('[Backend POST] Collection:', collection, 'Body:', req.body);
   const Model = collectionMap[collection];
   if (!Model) return next();
 
   try {
     const newItem = await Model.create(req.body);
+    console.log('[Backend POST] Success, newItem:', newItem);
     res.json({ success: true, item: newItem });
   } catch (err) {
+    console.error('[Backend POST] Error:', err);
     res.status(500).json({ success: false, message: err.message });
   }
 });
@@ -313,9 +316,12 @@ app.put('/api/settings', authenticateToken, async (req, res) => {
 // --- Upload Endpoint ---
 
 app.post('/api/upload', authenticateToken, upload.single('image'), (req, res) => {
+  console.log('[Backend Upload] Request received, file:', req.file);
   if (req.file) {
+    console.log('[Backend Upload] Success, filename:', req.file.filename);
     res.json({ success: true, url: `/uploads/${req.file.filename}` });
   } else {
+    console.log('[Backend Upload] Failed: no file');
     res.status(400).json({ success: false, message: 'Upload failed' });
   }
 });
