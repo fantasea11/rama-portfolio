@@ -849,10 +849,15 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
         </div>
 
         {/* Category Badge */}
-        <div className="absolute top-6 left-6">
+        <div className="absolute top-6 left-6 flex gap-2">
           <span className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-[9px] font-black text-white/70 uppercase tracking-[0.2em]">
             {project.category}
           </span>
+          {((project as any).isNewProject || (project as any).isNew) && (
+            <span className="px-3 py-1 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/30 text-[9px] font-black text-amber-400 uppercase tracking-[0.2em]">
+              NEW!!
+            </span>
+          )}
         </div>
       </div>
       
@@ -904,9 +909,16 @@ function Portfolio() {
       .catch(err => console.error("Failed to load dynamic categories:", err));
   }, []);
 
+  const sortedProjects = [...projects].sort((a, b) => {
+    const aIsNew = (a as any).isNewProject || (a as any).isNew;
+    const bIsNew = (b as any).isNewProject || (b as any).isNew;
+    if (aIsNew && !bIsNew) return -1;
+    if (!aIsNew && bIsNew) return 1;
+    return (a.order || 0) - (b.order || 0);
+  });
   const filteredProjects = filter === 'All' 
-    ? projects 
-    : projects.filter(p => p.category === filter);
+    ? sortedProjects 
+    : sortedProjects.filter(p => p.category === filter);
 
   return (
     <section id="portfolio" className="py-16 md:py-24 px-6 max-w-7xl mx-auto">

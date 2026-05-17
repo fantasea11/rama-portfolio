@@ -18,7 +18,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://fantaseaindo_db_user:I2mbUD0gxQUdZH83@cluster0.xfof3dx.mongodb.net/?appName=Cluster0';
@@ -53,7 +54,7 @@ const migrateData = async () => {
     // Check if users exist (database already populated)
     const userCount = await Models.User.countDocuments();
     if (userCount > 0) {
-      console.log('Database already populated, checking for social media fields in settings...');
+      console.log('Database already populated, checking for social media fields in settings and order/isNew in projects...');
       
       // Update existing settings to add social media fields and display names
       const existingSettings = await Models.Settings.findOne();
@@ -82,6 +83,26 @@ const migrateData = async () => {
         const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
         if (data.settings) await Models.Settings.create(data.settings);
       }
+
+      // Update existing projects to add order and isNewProject fields (rename isNew to isNewProject)
+      const existingProjects = await Models.Project.find();
+      if (existingProjects.length > 0) {
+        for (let i = 0; i < existingProjects.length; i++) {
+          const project = existingProjects[i];
+          await Models.Project.findOneAndUpdate(
+            { id: project.id },
+            { 
+              $set: { 
+                order: typeof project.order === 'undefined' || project.order === null ? i : project.order,
+                isNewProject: project.isNew || false 
+              }
+            },
+            { new: true }
+          );
+        }
+        console.log('Projects updated with order and isNewProject fields.');
+      }
+
       return;
     }
 

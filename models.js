@@ -12,7 +12,9 @@ const ProjectSchema = new mongoose.Schema({
   description: String,
   longDescription: String,
   technologies: [String],
-  images: [String]
+  images: [String],
+  order: { type: Number, default: 0 },
+  isNewProject: { type: Boolean, default: false }
 });
 
 const EducationSchema = new mongoose.Schema({

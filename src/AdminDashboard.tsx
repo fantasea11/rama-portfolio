@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { LogIn, Settings, FolderKanban, Plus, Edit2, Trash2, LogOut, Upload, X, Save, ArrowLeft, GraduationCap, Briefcase, Award, Layers, Activity, LayoutGrid } from 'lucide-react';
+import { LogIn, Settings, FolderKanban, Plus, Edit2, Trash2, LogOut, Upload, X, Save, ArrowLeft, GraduationCap, Briefcase, Award, Layers, Activity, LayoutGrid, ArrowUp, ArrowDown } from 'lucide-react';
 import { Project } from './constants';
 
 const API_URL = '/api';
@@ -95,41 +95,37 @@ export default function AdminDashboard() {
   const handleFileUpload = async (file: File) => {
     console.log('[Upload] Starting upload for file:', file.name, 'activeTab:', activeTab);
     setUploading(true);
-    const formDataObj = new FormData();
-    formDataObj.append('image', file);
 
     try {
-      const token = localStorage.getItem('adminToken');
-      console.log('[Upload] Token found:', !!token);
-      const res = await fetch(`${API_URL}/upload`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formDataObj
-      });
-      console.log('[Upload] Response status:', res.status);
-      const data = await res.json();
-      console.log('[Upload] Response data:', data);
-      if (data.success) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Data = reader.result as string;
+        console.log('[Upload] Converted to Base64, length:', base64Data.length);
+        
         if (activeTab === 'projects') {
           setFormData((prev: any) => {
-            const newImages = [...(prev.images || []), data.url];
-            console.log('[Upload] Updated formData images:', newImages);
+            const newImages = [...(prev.images || []), base64Data];
+            console.log('[Upload] Updated formData images:', newImages.length, 'images');
             return { ...prev, images: newImages };
           });
         } else {
           setFormData((prev: any) => {
-            console.log('[Upload] Updated formData image:', data.url);
-            return { ...prev, image: data.url };
+            console.log('[Upload] Updated formData image');
+            return { ...prev, image: base64Data };
           });
         }
         setAlertConfig({ message: 'Image uploaded successfully!', type: 'success' });
-      } else {
-        setAlertConfig({ message: data.message || 'Upload failed', type: 'error' });
-      }
+        setUploading(false);
+      };
+      reader.onerror = (error) => {
+        console.error('[Upload] FileReader error:', error);
+        setAlertConfig({ message: 'Failed to process image', type: 'error' });
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
     } catch (err) {
       console.error('[Upload] Failed:', err);
       setAlertConfig({ message: 'Failed to upload image: ' + (err as Error).message, type: 'error' });
-    } finally {
       setUploading(false);
     }
   };
@@ -168,6 +164,7 @@ export default function AdminDashboard() {
       try {
         const res = await fetch(`${API_URL}/${collection}`);
         const data = await res.json();
+        if (collection === 'projects') console.log('[fetchData] Projects data:', data);
         setDataStore(prev => ({ ...prev, [collection]: data }));
       } catch (err) {
         console.error(`Failed to fetch ${collection}`, err);
@@ -237,10 +234,14 @@ export default function AdminDashboard() {
   const handleOpenModal = (item?: any) => {
     if (item) {
       setEditingItem(item);
-      setFormData(item);
+      setFormData({ 
+        ...item, 
+        isNewProject: typeof item.isNewProject === 'boolean' ? item.isNewProject : typeof item.isNew === 'boolean' ? item.isNew : false,
+        order: typeof item.order === 'number' ? item.order : 0
+      });
     } else {
       setEditingItem(null);
-      if (activeTab === 'projects') setFormData({ id: `proj-${Date.now()}`, title: '', category: 'Web Dev', description: '', longDescription: '', technologies: [], images: [] });
+      if (activeTab === 'projects') setFormData({ id: `proj-${Date.now()}`, title: '', category: 'Web Dev', description: '', longDescription: '', technologies: [], images: [], order: dataStore.projects.length, isNewProject: false });
       else if (activeTab === 'education') setFormData({ id: `edu-${Date.now()}`, title: '', date: '', subtitle: '', description: '', tags: [] });
       else if (activeTab === 'experience') setFormData({ id: `exp-${Date.now()}`, title: '', date: '', subtitle: '', description: '', tags: [] });
       else if (activeTab === 'certification') setFormData({ id: `cert-${Date.now()}`, title: '', subtitle: '', features: [], image: '' });
@@ -285,6 +286,11 @@ export default function AdminDashboard() {
       console.log('[Save] Token found:', !!token);
       // Ensure the payload has 'title' if it's not proficiencies, or handle accordingly
       const payload = { ...formData };
+      // Ensure order and isNewProject are numbers/booleans
+      if (activeTab === 'projects') {
+        payload.order = typeof payload.order === 'number' ? payload.order : 0;
+        payload.isNewProject = !!payload.isNewProject;
+      }
       console.log('[Save] Payload:', payload);
       
       if (editingItem) {
@@ -297,6 +303,8 @@ export default function AdminDashboard() {
           body: JSON.stringify(payload)
         });
         console.log('[Save] PUT Response status:', res.status);
+        const resData = await res.json();
+        console.log('[Save] PUT Response data:', resData);
         if (res.ok) fetchData();
       } else {
         const res = await fetch(`${API_URL}/${activeTab}`, {
@@ -337,6 +345,105 @@ export default function AdminDashboard() {
     } finally {
       setItemToDelete(null);
     }
+  };
+
+  const [draggedItem, setDraggedItem] = useState<any>(null);
+
+  const getSortedProjects = () => {
+    return [...dataStore.projects].sort((a, b) => {
+      const aIsNew = a.isNewProject || a.isNew;
+      const bIsNew = b.isNewProject || b.isNew;
+      if (aIsNew && !bIsNew) return -1;
+      if (!aIsNew && bIsNew) return 1;
+      return (a.order || 0) - (b.order || 0);
+    });
+  };
+
+  const handleMoveProject = async (projectId: string, direction: 'up' | 'down') => {
+    const projects = getSortedProjects();
+    const currentIndex = projects.findIndex(p => p.id === projectId);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex < 0 || newIndex >= projects.length) return;
+
+    const [movedProject] = projects.splice(currentIndex, 1);
+    projects.splice(newIndex, 0, movedProject);
+
+    const newProjects = projects;
+    const newProjectsIsNew = newProjects.filter(p => p.isNewProject || p.isNew);
+    const newProjectsNotNew = newProjects.filter(p => !(p.isNewProject || p.isNew));
+
+    const finalProjects = [...newProjectsIsNew, ...newProjectsNotNew];
+    const updatedProjects = finalProjects.map((p, idx) => ({ ...p, order: idx }));
+    const token = localStorage.getItem('adminToken');
+
+    for (const project of updatedProjects) {
+      await fetch(`${API_URL}/projects/${project.id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ order: project.order })
+      });
+    }
+
+    fetchData();
+    setAlertConfig({ message: 'Project order updated!', type: 'success' });
+  };
+
+  const handleProjectDragStart = (e: React.DragEvent, project: any) => {
+    setDraggedItem(project);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleProjectDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleProjectDrop = async (e: React.DragEvent, targetProject: any) => {
+    e.preventDefault();
+    if (!draggedItem || draggedItem.id === targetProject.id) {
+      setDraggedItem(null);
+      return;
+    }
+
+    const projects = getSortedProjects();
+    const draggedIndex = projects.findIndex(p => p.id === draggedItem.id);
+    const targetIndex = projects.findIndex(p => p.id === targetProject.id);
+    
+    if (draggedIndex === -1 || targetIndex === -1) {
+      setDraggedItem(null);
+      return;
+    }
+
+    const [movedProject] = projects.splice(draggedIndex, 1);
+    projects.splice(targetIndex, 0, movedProject);
+
+    const newProjects = projects;
+    const newProjectsIsNew = newProjects.filter(p => p.isNewProject || p.isNew);
+    const newProjectsNotNew = newProjects.filter(p => !(p.isNewProject || p.isNew));
+
+    const finalProjects = [...newProjectsIsNew, ...newProjectsNotNew];
+    const updatedProjects = finalProjects.map((p, idx) => ({ ...p, order: idx }));
+    const token = localStorage.getItem('adminToken');
+
+    for (const project of updatedProjects) {
+      await fetch(`${API_URL}/projects/${project.id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ order: project.order })
+      });
+    }
+
+    setDraggedItem(null);
+    fetchData();
+    setAlertConfig({ message: 'Project order updated!', type: 'success' });
   };
 
   // --- Settings Tab ---
@@ -386,40 +493,39 @@ export default function AdminDashboard() {
     if (!file) return;
 
     setUploadingProfile(true);
-    const formDataObj = new FormData();
-    formDataObj.append('image', file);
 
     try {
-      const token = localStorage.getItem('adminToken');
-      // 1. Upload the image
-      const uploadRes = await fetch(`${API_URL}/upload`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formDataObj
-      });
-      const uploadData = await uploadRes.json();
-      
-      if (uploadData.success) {
-        // 2. Save to settings
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Data = reader.result as string;
+        const token = localStorage.getItem('adminToken');
+        
+        // Save to settings
         const settingsRes = await fetch(`${API_URL}/settings`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({ profilePicture: uploadData.url })
+          body: JSON.stringify({ profilePicture: base64Data })
         });
         const settingsData = await settingsRes.json();
         
         if (settingsData.success) {
-          setProfilePicture(uploadData.url);
+          setProfilePicture(base64Data);
           setAlertConfig({ message: 'Profile picture updated!', type: 'success' });
         }
-      }
+        setUploadingProfile(false);
+      };
+      reader.onerror = (error) => {
+        console.error('[Profile Upload] FileReader error:', error);
+        setAlertConfig({ message: 'Failed to process image', type: 'error' });
+        setUploadingProfile(false);
+      };
+      reader.readAsDataURL(file);
     } catch (err) {
-      console.error('Upload failed', err);
-      setAlertConfig({ message: 'Failed to update profile picture', type: 'error' });
-    } finally {
+      console.error('[Profile Upload] Failed:', err);
+      setAlertConfig({ message: 'Failed to update profile picture: ' + (err as Error).message, type: 'error' });
       setUploadingProfile(false);
     }
   };
@@ -650,8 +756,20 @@ export default function AdminDashboard() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                {dataStore[activeTab]?.map((p: any) => (
-                  <div key={p.id} className="glass p-6 rounded-[24px] border border-white/5 group hover:border-blue-500/30 transition-colors flex flex-col h-full">
+                {(activeTab === 'projects' ? getSortedProjects() : dataStore[activeTab])?.map((p: any) => (
+                  <div 
+                    key={p.id} 
+                    className={`glass p-6 rounded-[24px] border border-white/5 group hover:border-blue-500/30 transition-colors flex flex-col h-full ${activeTab === 'projects' ? 'cursor-move' : ''} ${draggedItem?.id === p.id ? 'opacity-50 scale-95' : ''}`}
+                    draggable={activeTab === 'projects'}
+                    onDragStart={activeTab === 'projects' ? (e) => handleProjectDragStart(e, p) : undefined}
+                    onDragOver={activeTab === 'projects' ? handleProjectDragOver : undefined}
+                    onDrop={activeTab === 'projects' ? (e) => handleProjectDrop(e, p) : undefined}
+                  >
+                    {(activeTab === 'projects' && (p.isNewProject || p.isNew)) && (
+                      <div className="mb-4">
+                        <span className="text-[9px] font-black text-amber-400 uppercase tracking-widest bg-amber-500/10 px-2 py-1 rounded border border-amber-500/20">NEW!!</span>
+                      </div>
+                    )}
                     {(p.images?.[0] || p.image) && (
                       <div className="w-full h-48 bg-slate-900 rounded-xl mb-6 overflow-hidden border border-white/5 flex-shrink-0">
                         <img src={p.images?.[0] || p.image} alt={p.title} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
@@ -664,6 +782,24 @@ export default function AdminDashboard() {
                     <p className="text-sm text-gray-400 line-clamp-2 mb-6 flex-1">{p.description || p.summary || p.subtitle || (p.level ? `Level: ${p.level}%` : '')}</p>
                     
                     <div className="flex gap-3 mt-auto pt-6 border-t border-white/5">
+                      {activeTab === 'projects' && (
+                        <>
+                          <button 
+                            onClick={() => handleMoveProject(p.id, 'up')}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/5"
+                            title="Move Up"
+                          >
+                            <ArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button 
+                            onClick={() => handleMoveProject(p.id, 'down')}
+                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors border border-white/5"
+                            title="Move Down"
+                          >
+                            <ArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
                       <button 
                         onClick={() => handleOpenModal(p)}
                         className="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-colors border border-white/5"
@@ -987,14 +1123,30 @@ export default function AdminDashboard() {
                   )}
                   
                   {activeTab === 'projects' && (
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Category</label>
-                      <select value={formData.category || (projectCategories[0] || 'Other')} onChange={e => setFormData({...formData, category: e.target.value as any})} className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none cursor-pointer">
-                        {projectCategories.map(cat => (
-                          <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                      </select>
-                    </div>
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Category</label>
+                        <select value={formData.category || (projectCategories[0] || 'Other')} onChange={e => setFormData({...formData, category: e.target.value as any})} className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm appearance-none cursor-pointer">
+                          {projectCategories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Order (Lower = Top)</label>
+                        <input type="number" value={formData.order || 0} onChange={e => setFormData({...formData, order: parseInt(e.target.value) || 0})} className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white text-sm" />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Mark as NEW!!</label>
+                        <button 
+                          type="button"
+                          onClick={() => setFormData({...formData, isNewProject: !formData.isNewProject})} 
+                          className={`w-12 h-7 rounded-full transition-colors ${formData.isNewProject ? 'bg-blue-500' : 'bg-gray-700'}`}
+                        >
+                          <div className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${formData.isNewProject ? 'translate-x-6' : 'translate-x-1'}`} />
+                        </button>
+                      </div>
+                    </>
                   )}
 
                   {['education', 'experience'].includes(activeTab) && (
