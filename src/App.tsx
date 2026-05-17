@@ -125,9 +125,14 @@ function Hero() {
         <span className="inline-block px-4 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold tracking-wider uppercase mb-6 border border-blue-500/20">
           Informatics Graduate
         </span>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-8 tracking-tighter leading-tight uppercase overflow-hidden font-display">
-          HAI! I'M <span className="text-gradient">GALUH RAMA ISMAYA</span>
-        </h1>
+        <div className="text-center space-y-2 mb-8 font-display">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-tight uppercase overflow-hidden">
+            HAI! I'M
+          </h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-tight uppercase overflow-hidden">
+            <span className="text-gradient">GALUH RAMA ISMAYA</span>
+          </h1>
+        </div>
         <p className="text-base md:text-xl text-gray-400 max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed font-medium">
           An Informatics graduate with Cum Laude honors (GPA 3.82), 
           offering a unique blend of technical IT expertise and digital creativity.
