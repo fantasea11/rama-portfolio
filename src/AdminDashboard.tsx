@@ -52,10 +52,73 @@ export default function AdminDashboard() {
   
   const [editingTechIndex, setEditingTechIndex] = useState<number | null>(null);
   const [techEditValue, setTechEditValue] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleTechEditStart = (index: number, val: string) => {
     setEditingTechIndex(index);
     setTechEditValue(val);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        handleFileUpload(file);
+      }
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (item.type.indexOf('image') !== -1) {
+        const file = item.getAsFile();
+        if (file) {
+          handleFileUpload(file);
+        }
+      }
+    }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    setUploading(true);
+    const formDataObj = new FormData();
+    formDataObj.append('image', file);
+
+    try {
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch(`${API_URL}/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formDataObj
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (activeTab === 'projects') {
+          setFormData((prev: any) => ({ ...prev, images: [...(prev.images || []), data.url] }));
+        } else {
+          setFormData((prev: any) => ({ ...prev, image: data.url }));
+        }
+        setAlertConfig({ message: 'Image uploaded successfully!', type: 'success' });
+      }
+    } catch (err) {
+      console.error('Upload failed', err);
+      setAlertConfig({ message: 'Failed to upload image', type: 'error' });
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleTechEditCommit = (index: number) => {
@@ -184,33 +247,7 @@ export default function AdminDashboard() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    setUploading(true);
-    const formDataObj = new FormData();
-    formDataObj.append('image', file);
-
-    try {
-      const token = localStorage.getItem('adminToken');
-      const res = await fetch(`${API_URL}/upload`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formDataObj
-      });
-      const data = await res.json();
-      if (data.success) {
-        if (activeTab === 'projects') {
-          setFormData((prev: any) => ({ ...prev, images: [...(prev.images || []), data.url] }));
-        } else {
-          setFormData((prev: any) => ({ ...prev, image: data.url }));
-        }
-        setAlertConfig({ message: 'Image uploaded successfully!', type: 'success' });
-      }
-    } catch (err) {
-      console.error('Upload failed', err);
-      setAlertConfig({ message: 'Failed to upload image', type: 'error' });
-    } finally {
-      setUploading(false);
-    }
+    handleFileUpload(file);
   };
 
   const handleRemoveImage = (index: number) => {
@@ -1045,7 +1082,10 @@ export default function AdminDashboard() {
                 )}
 
                 {['projects', 'certification', 'seminars'].includes(activeTab) && (
-                  <div className="space-y-4 pt-4 border-t border-white/5">
+                  <div 
+                    className="space-y-4 pt-4 border-t border-white/5" 
+                    onPaste={handlePaste}
+                  >
                     <div className="flex justify-between items-end">
                       <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Images</label>
                       <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-xs font-bold hover:bg-blue-500/20 transition-colors disabled:opacity-50">
@@ -1067,9 +1107,15 @@ export default function AdminDashboard() {
                           ))}
                         </div>
                       ) : (
-                        <div className="w-full py-8 border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center text-gray-500">
+                        <div 
+                          className={`w-full py-8 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-gray-500 transition-all ${isDragging ? 'border-blue-500 bg-blue-500/10' : 'border-white/10'}`}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
                           <Upload className="w-8 h-8 mb-2 opacity-50" />
-                          <p className="text-xs font-bold">No images uploaded yet</p>
+                          <p className="text-xs font-bold mb-1">No images uploaded yet</p>
+                          <p className="text-[10px] text-gray-600">Drag & drop, paste (Ctrl+V), or click upload</p>
                         </div>
                       )
                     ) : (
@@ -1081,9 +1127,15 @@ export default function AdminDashboard() {
                           </button>
                         </div>
                       ) : (
-                        <div className="w-full max-w-sm py-8 border-2 border-dashed border-white/10 rounded-xl flex flex-col items-center justify-center text-gray-500">
+                        <div 
+                          className={`w-full max-w-sm py-8 border-2 border-dashed rounded-xl flex flex-col items-center justify-center text-gray-500 transition-all ${isDragging ? 'border-blue-500 bg-blue-500/10' : 'border-white/10'}`}
+                          onDragOver={handleDragOver}
+                          onDragLeave={handleDragLeave}
+                          onDrop={handleDrop}
+                        >
                           <Upload className="w-8 h-8 mb-2 opacity-50" />
-                          <p className="text-xs font-bold">No image uploaded yet</p>
+                          <p className="text-xs font-bold mb-1">No image uploaded yet</p>
+                          <p className="text-[10px] text-gray-600">Drag & drop, paste (Ctrl+V), or click upload</p>
                         </div>
                       )
                     )}
